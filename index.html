@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="zSVa4QqDXXkFdxktSG883K">
+<head data-page-node-id="dwt2yrqa8c9aKM9ZQBG4BH">
+<meta charset="UTF-8" data-page-node-id="KYfyCiCR6Zpx0CYXczLZz9">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" data-page-node-id="FTiQd7DxvsBtZfPjttB57O">
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="PNOFCWzOR5nCwFNHYtIKe3">
+<meta name="theme-color" content="#F5EFE4" data-page-node-id="us1LdxCjSDXnYpg5hJll5s">
+<title>Python 词卡 · 不背单词式记忆</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#211E19">
+<style>
+:root{
+  --paper:#F5EFE4;
+  --paper2:#EFE7D8;
+  --ink:#211E19;
+  --ink-soft:#5C564B;
+  --ink-faint:#9A917F;
+  --hair:#DED4C0;
+  --accent:#C8462B;
+  --amber:#B97A0E;
+  --green:#3E7C4F;
+  --card:#FBF8F1;
+  --code-bg:#23201B;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer;touch-action:manipulation;font-family:inherit}
+html,body{min-height:100%}
+body{
+  position:relative;
+  min-height:100vh;
+  min-height:100dvh;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  overflow:hidden;
+  overscroll-behavior:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.serif{font-family:Georgia,"Times New Roman","Songti SC","STSong",serif}
+.mono{font-family:"SF Mono","JetBrains Mono",Consolas,"Courier New",monospace}
+.screen{position:relative;width:100%;height:100vh;height:100dvh;min-height:100dvh;display:none;flex-direction:column;z-index:1;max-width:560px;margin:0 auto;background:var(--paper)}
+.screen.active{display:flex}
+/* 触摸滚动：允许内部区域纵向滚动 */
+#home,.card-body,.quiz-card{-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
+@media(min-width:600px){.screen{border-left:1px solid var(--hair);border-right:1px solid var(--hair)}}
+
+/* ============ HOME ============ */
+#home{padding:0;overflow-y:auto}
+.home-inner{padding:52px 28px 48px;display:flex;flex-direction:column;min-height:100%}
+.brand-tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.25em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:18px}
+.brand-tag::before{content:"";width:26px;height:1px;background:var(--accent)}
+.home-title{font-size:clamp(30px,8.6vw,44px);line-height:1.12;font-weight:700;letter-spacing:.01em}
+.home-title em{font-style:normal;color:var(--accent)}
+.home-sub{margin-top:14px;color:var(--ink-soft);font-size:clamp(12.5px,3.6vw,14.5px);line-height:1.7}
+.stats-row{display:flex;gap:10px;margin:30px 0 8px}
+.stat-chip{flex:1;background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px 12px;text-align:center}
+.stat-chip .num{font-size:clamp(20px,6vw,26px);font-weight:700}
+.stat-chip .num small{font-size:13px;color:var(--ink-faint);font-weight:400}
+.stat-chip .lbl{font-size:11.5px;color:var(--ink-faint);margin-top:3px;letter-spacing:.08em}
+.deck-card{background:var(--card);border:1px solid var(--hair);border-radius:20px;padding:20px 22px;margin-top:16px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;position:relative;overflow:hidden}
+.deck-card:active{transform:scale(.975)}
+.deck-card .deck-kind{font-size:11px;letter-spacing:.22em;color:var(--accent);text-transform:uppercase;margin-bottom:6px}
+.deck-card .deck-name{font-size:clamp(19px,5.6vw,24px);font-weight:700}
+.deck-card .deck-meta{margin-top:6px;font-size:clamp(11.5px,3.3vw,13px);color:var(--ink-soft)}
+.deck-card .deck-bar{height:5px;background:var(--paper2);border-radius:3px;margin-top:14px;overflow:hidden}
+.deck-card .deck-bar i{display:block;height:100%;background:var(--green);border-radius:3px;transition:width .5s ease}
+.deck-card .arrow{position:absolute;right:20px;top:22px;color:var(--ink-faint);font-size:18px}
+.quiz-btn{margin-top:26px;background:var(--ink);color:var(--paper);border:none;border-radius:18px;padding:19px 22px;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:transform .18s ease}
+.quiz-btn:active{transform:scale(.975)}
+.quiz-btn span:last-child{font-size:12.5px;font-weight:400;color:#B8B0A0;letter-spacing:.06em}
+#install-btn{display:none;margin-top:12px;width:100%;border:1.5px dashed var(--ink-soft);background:transparent;color:var(--ink);border-radius:16px;padding:14px;font-size:clamp(13px,3.8vw,15px);font-weight:600;cursor:pointer;touch-action:manipulation}
+#install-btn:active{transform:scale(.98)}
+#install-tip{margin-top:8px;text-align:center;font-size:12px;color:var(--ink-faint);line-height:1.7}
+.reset-link{margin-top:auto;padding-top:34px;text-align:center;font-size:12.5px;color:var(--ink-faint);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ============ STUDY ============ */
+.topbar{display:flex;align-items:center;gap:14px;padding:14px 18px 10px;flex-shrink:0}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--hair);background:var(--card);color:var(--ink-soft);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.progress-wrap{flex:1}
+.progress-info{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-faint);margin-bottom:6px;letter-spacing:.05em}
+.progress-track{height:5px;background:var(--paper2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s cubic-bezier(.22,1,.36,1)}
+.card-zone{flex:1;display:flex;flex-direction:column;padding:6px 18px 0;min-height:0}
+.word-card{flex:1;background:var(--card);border:1px solid var(--hair);border-radius:26px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 14px 40px -18px rgba(60,48,28,.25);min-height:0;cursor:pointer;animation:cardIn .45s cubic-bezier(.22,1,.36,1)}
+@keyframes cardIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+.word-head{padding:34px 26px 22px;text-align:center;flex-shrink:0;border-bottom:1px dashed var(--hair)}
+.word-kind{display:inline-block;font-size:10.5px;letter-spacing:.28em;color:var(--accent);text-transform:uppercase;border:1px solid currentColor;border-radius:99px;padding:4px 12px 3px;margin-bottom:18px}
+.word-name{font-size:clamp(32px,13vw,52px);font-weight:700;letter-spacing:.01em;line-height:1.1;word-break:break-all}
+.word-cat{margin-top:12px;font-size:12.5px;color:var(--ink-faint);letter-spacing:.12em}
+.word-syntax{margin:16px auto 0;display:inline-block;font-size:clamp(11.5px,3.4vw,13.5px);background:var(--paper2);border-radius:10px;padding:8px 14px;color:var(--ink-soft);max-width:100%;overflow-x:auto;white-space:nowrap}
+.reveal-hint{text-align:center;padding:16px 0;color:var(--ink-faint);font-size:13px;letter-spacing:.1em;animation:pulse 1.8s ease-in-out infinite;flex:1;display:flex;align-items:center;justify-content:center;gap:8px}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+.card-body{flex:1;overflow-y:auto;padding:20px 24px 26px;display:none;user-select:text;-webkit-user-select:text}
+.word-card.revealed .card-body{display:block;animation:fadeUp .4s ease}
+.word-card.revealed .reveal-hint{display:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.sec-label{font-size:11px;letter-spacing:.24em;color:var(--ink-faint);text-transform:uppercase;margin:20px 0 8px;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:"";flex:1;height:1px;background:var(--hair)}
+.sec-label:first-child{margin-top:0}
+.desc-text{font-size:clamp(13.5px,3.9vw,15.5px);line-height:1.85;color:var(--ink)}
+.code-block{background:var(--code-bg);color:#EDE6D6;border-radius:14px;padding:14px 16px;font-size:clamp(11.5px,3.3vw,13px);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.code-out{background:#2C2822;color:#9BD57E;border-left:3px solid var(--green);border-radius:0 12px 12px 0;padding:12px 16px;font-size:clamp(11.5px,3.3vw,13px);line-height:1.7;white-space:pre-wrap;word-break:break-all;margin-top:8px}
+.param-table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1px solid var(--hair);border-radius:12px;overflow:hidden}
+.param-table th{background:var(--paper2);text-align:left;padding:8px 10px;font-weight:600;color:var(--ink-soft);font-size:11.5px}
+.param-table td{padding:8px 10px;border-top:1px solid var(--hair);vertical-align:top;line-height:1.5}
+.param-table td:first-child{color:var(--accent);font-weight:600;white-space:nowrap}
+.rate-row{display:flex;gap:10px;padding:14px 18px calc(16px + env(safe-area-inset-bottom));flex-shrink:0}
+.rate-btn{flex:1;min-height:52px;border-radius:16px;padding:15px 0 13px;font-size:clamp(14px,4.2vw,16px);font-weight:600;cursor:pointer;border:1.5px solid;transition:transform .12s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--card)}
+.rate-btn:active{transform:scale(.94)}
+.rate-btn small{font-size:10.5px;font-weight:400;opacity:.75;letter-spacing:.06em}
+.rate-again{color:var(--accent);border-color:var(--accent)}
+.rate-hard{color:var(--amber);border-color:var(--amber)}
+.rate-good{color:#fff;background:var(--green);border-color:var(--green)}
+
+/* ============ DONE ============ */
+#done{align-items:center;justify-content:center;text-align:center;padding:40px 30px}
+.done-badge{width:88px;height:88px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:26px;animation:pop .6s cubic-bezier(.22,1.6,.36,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.done-title{font-size:clamp(26px,7.8vw,34px);font-weight:700}
+.done-sub{margin-top:12px;color:var(--ink-soft);font-size:14.5px;line-height:1.8}
+.done-stats{display:flex;gap:12px;margin:30px 0;width:100%}
+.done-stats .stat-chip{padding:16px 12px}
+.done-btns{width:100%;display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.btn-primary{background:var(--ink);color:var(--paper);border:none;border-radius:16px;padding:17px;font-size:clamp(14px,4.2vw,16px);font-weight:600;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--hair);border-radius:16px;padding:15px;font-size:15px;cursor:pointer}
+
+/* ============ QUIZ ============ */
+.quiz-zone{flex:1;display:flex;flex-direction:column;padding:6px 18px 0;min-height:0}
+.quiz-card{flex:1;background:var(--card);border:1px solid var(--hair);border-radius:26px;padding:26px 24px;overflow-y:auto;box-shadow:0 14px 40px -18px rgba(60,48,28,.25);min-height:0;user-select:text;-webkit-user-select:text}
+.quiz-q-label{font-size:11px;letter-spacing:.24em;color:var(--accent);text-transform:uppercase;margin-bottom:14px}
+.quiz-desc{font-size:clamp(14.5px,4.2vw,17px);line-height:1.9;color:var(--ink)}
+/* 折叠：答题前整块收起（不是马赛克），答完展开 */
+.quiz-example{margin-top:16px}
+.quiz-example.locked .code-block,.quiz-example.locked .code-out{display:none}
+.lock-hint{display:none;font-size:13px;color:var(--ink-faint);background:var(--paper2);border:1px dashed var(--hair);border-radius:12px;padding:12px 14px;text-align:center;line-height:1.6;cursor:default}
+.quiz-example.locked .lock-hint{display:block}
+.quiz-example .code-block,.quiz-example .code-out{animation:unfold .28s ease}
+@keyframes unfold{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.opt-list{display:flex;flex-direction:column;gap:10px;padding:14px 18px calc(16px + env(safe-area-inset-bottom));flex-shrink:0}
+.opt-btn{background:var(--card);border:1.5px solid var(--hair);border-radius:16px;padding:15px 18px;font-size:clamp(16px,4.6vw,19px);text-align:left;cursor:pointer;transition:all .15s ease;display:flex;align-items:center;justify-content:space-between;color:var(--ink)}
+.opt-btn:active{transform:scale(.97)}
+.opt-btn .suffix{font-size:12px;color:var(--ink-faint)}
+.opt-btn.correct{background:#EAF3EC;border-color:var(--green);color:var(--green)}
+.opt-btn.wrong{background:#F9EAE5;border-color:var(--accent);color:var(--accent)}
+.opt-btn:disabled{cursor:default}
+.quiz-score-line{font-size:13px;color:var(--ink-faint);text-align:center;padding-bottom:8px;flex-shrink:0}
+/* ============ 小屏 / 矮屏适配（应对分享页 iframe 高度受限） ============ */
+@media(max-width:390px){
+  .home-inner{padding:40px 20px 40px}
+  .home-title{font-size:clamp(28px,8vw,36px)}
+  .word-name{font-size:clamp(30px,11.5vw,42px)}
+  .word-head{padding:24px 18px 18px}
+  .card-body{padding:16px 18px 22px}
+  .rate-btn{font-size:15px;padding:13px 0 11px}
+  .opt-btn{font-size:17px;padding:13px 15px}
+  .deck-card{padding:17px 18px}
+  .deck-card .deck-name{font-size:21px}
+}
+@media(max-height:680px){
+  .home-title{font-size:clamp(26px,7.4vw,33px)}
+  .home-sub{margin-top:10px;font-size:13.5px}
+  .stats-row{margin:18px 0 4px}
+  .word-name{font-size:clamp(28px,10.5vw,38px)}
+  .word-head{padding:20px 18px 14px}
+  .word-syntax{margin-top:10px}
+  .reveal-hint{padding:10px 0}
+  .deck-card{margin-top:12px;padding:15px 18px}
+  .quiz-btn{margin-top:18px;padding:15px 18px}
+}
+</style>
+</head>
+<body data-page-node-id="yoggiumyCHE4U7AYSUdlu0">
+
+<!-- ================= 首页 ================= -->
+<div class="screen active" id="home" data-page-node-id="PgnbejDlS5Q24U9M08YE5J">
+  <div class="home-inner" data-page-node-id="AyXkUGkRlJOtAaC7dOFjxY">
+    <div class="brand-tag" data-page-node-id="6mEi0XDF5N007eGviV082a">Python Recite</div>
+    <div class="home-title serif" data-page-node-id="F8gC31JBaNoAz47vfpGHxo">像背单词一样<br data-page-node-id="HMiAkkXxgb5cLgfMVvSRBD">记住 <em data-page-node-id="4KrZ4LHtrZSIZ3l1KYprHj">Python</em></div>
+    <div class="home-sub" data-page-node-id="MmGMm4yq8eAH1fUGZGRYRo">76 张词卡 · 内置函数 × 字符串方法<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">每次打开顺序都不同<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">看卡片回忆用法，认识就翻下一张，模糊就再来一遍。</div>
+    <div class="stats-row" data-page-node-id="EK3FvO2ImyEpenQEEvFRXi">
+      <div class="stat-chip" data-page-node-id="GQULZkK8tRqFlYiX9W8V66"><div class="num serif" id="stat-total" data-page-node-id="ABpJ1EFiDjESz7PnwwtKMg">0</div><div class="lbl" data-page-node-id="g2U4gC4fQJB94eHHymeHSJ">词卡总数</div></div>
+      <div class="stat-chip" data-page-node-id="I46h37vCVCYz7aUbxXL51Z"><div class="num serif" id="stat-known" style="color:var(--green)" data-page-node-id="kb4eulTWafBUdAaBn6HfFW">0</div><div class="lbl" data-page-node-id="yYDDtMCuGe9KC8bMDHORoM">内置函数</div></div>
+      <div class="stat-chip" data-page-node-id="77TVQZhDM5ToF95VJ8rwDB"><div class="num serif" id="stat-pct" data-page-node-id="H4k3aPnaXC0oPAzFnhii0Q">0<small data-page-node-id="QBuW0dwlbwSArzvS4q8Rwm">%</small></div><div class="lbl" data-page-node-id="vG0EyrHhy7SoT6s9lf8hs7">字符串方法</div></div>
+    </div>
+    <div class="deck-card" onclick="startStudy('builtin')" data-page-node-id="ANYoKArrg3FMl8dDR0Rzvu">
+      <div class="deck-kind" data-page-node-id="OCGcDqU61AzYVa55Lwtse9">Chapter 7 · 函数</div>
+      <div class="deck-name serif" data-page-node-id="KAsawTxOxxYMbFpTIqtUR3">内置函数 <span style="font-size:14px;color:var(--ink-faint);font-weight:400" data-page-node-id="RxSQlRrEJbUqaOHhEcUj3g">print · len · range…</span></div>
+      <div class="deck-meta" id="meta-builtin" data-page-node-id="Oi53rdPiCHtYrnqPvNl8zm">共 26 张</div>
+      <div class="deck-bar" data-page-node-id="1HI1NciQ43XxF7zvUmXATq"><i id="bar-builtin" style="width:0%" data-page-node-id="Q21ment5exO3kEg7LjnBFc"></i></div>
+      <div class="arrow" data-page-node-id="XgUIXcGrcP1m13kb96stSL">→</div>
+    </div>
+    <div class="deck-card" onclick="startStudy('str')" data-page-node-id="B6jtHkkC5T06HCbBC2JM1O">
+      <div class="deck-kind" data-page-node-id="oQewhgapL7Axs1EQAHCYb5">Chapter 4 · 字符串</div>
+      <div class="deck-name serif" data-page-node-id="FKmFB4vQHRhyGNXp5vlLws">字符串方法 <span style="font-size:14px;color:var(--ink-faint);font-weight:400" data-page-node-id="EOTy83ABZ3Df6FFtkQpPNk">split · join · strip…</span></div>
+      <div class="deck-meta" id="meta-str" data-page-node-id="cxl7ijQ9vItKZWgus6BeY7">共 46 张</div>
+      <div class="deck-bar" data-page-node-id="5pwIM24H8ZfpWGqa9Xq3CN"><i id="bar-str" style="width:0%" data-page-node-id="0195bM05LxM4w9oBHH5AYn"></i></div>
+      <div class="arrow" data-page-node-id="8zZQhXGIWmJvjUBJGGkwWX">→</div>
+    </div>
+    <div class="deck-card" onclick="startStudy('all')" data-page-node-id="Ol2dthDd1GpL5pTYactgF3">
+      <div class="deck-kind" data-page-node-id="thMTZcTI39rdWqtbyPW4gy">Mixed Review</div>
+      <div class="deck-name serif" data-page-node-id="iByHHq2duN6s9osEduVOxK">混合复习</div>
+      <div class="deck-meta" id="meta-all" data-page-node-id="F9smqiFeIT4CIm5T2jmcOk">全部 72 张，随机乱序</div>
+      <div class="deck-bar" data-page-node-id="i096zjmhkEs23elOtPnpBj"><i id="bar-all" style="width:0%" data-page-node-id="tGcORbdb8yJzSnG0TEUwx5"></i></div>
+      <div class="arrow" data-page-node-id="0BCauj3fDmj0IApFbSTphz">→</div>
+    </div>
+    <button class="quiz-btn" onclick="startQuiz()" data-page-node-id="B8uMCn8QvaPeOcCFju1Rv6">
+      <span data-page-node-id="ti4GYFDC6m4J63MpJdh7X1">✍️ 开始自测</span><span data-page-node-id="b9GvT793sEYEHV84AUyatm">看用法 · 选英文名</span>
+    </button>
+    <button id="install-btn" onclick="doInstall()" data-page-node-id="installBtn">📲 把词卡安装到手机桌面</button>
+    <div id="install-tip" data-page-node-id="installTip"></div>
+  </div>
+</div>
+
+<!-- ================= 学习 ================= -->
+<div class="screen" id="study" data-page-node-id="eVyI1uvkVhZhxqwjcz0Qup">
+  <div class="topbar" data-page-node-id="yDNPwMRcFtEL9DbiDyTUAG">
+    <button class="back-btn" onclick="goHome()" data-page-node-id="NzsfSaLTJBpRdtBMDOUIac">←</button>
+    <div class="progress-wrap" data-page-node-id="OOBFkJMRAM08AHWVFzOO6j">
+      <div class="progress-info" data-page-node-id="9SH1AjoI7JQlPaS76EgIlD"><span id="study-deck-name" data-page-node-id="fWfpj0PFlu0miz7kuLfmf6">学习</span><span id="study-count" data-page-node-id="PDbRGUGwjEoyonskUykGdr">0 / 0</span></div>
+      <div class="progress-track" data-page-node-id="uAsSR8EhUCkGEaQFeY4GyY"><div class="progress-fill" id="study-progress" style="width:0%" data-page-node-id="RkCClUppuuGRzHHHHVqHoA"></div></div>
+    </div>
+  </div>
+  <div class="card-zone" data-page-node-id="NwkmpzyLR59YBu0UXUisFZ">
+    <div class="word-card" id="word-card" onclick="revealCard()" data-page-node-id="VjukcTrtuR1DJISlp3TfPj">
+      <div class="word-head" data-page-node-id="C4o0XJBDKXmWiAD8K0aUgT">
+        <div class="word-kind" id="w-kind" data-page-node-id="2MKmAb3qpLOajldUKv87HC"></div>
+        <div class="word-name serif" id="w-name" data-page-node-id="qnZbFHkKr9qac728rOPFwW"></div>
+        <div class="word-cat" id="w-cat" data-page-node-id="B6p53UlHMDFGhZqPfUFhmY"></div>
+        <div class="word-syntax mono" id="w-syntax" data-page-node-id="BB2gmRuO7KE8dE1gsQJCsE"></div>
+      </div>
+      <div class="reveal-hint" data-page-node-id="JbD1MijqLFLFSJxyIxPw4f">👆 点击卡片查看释义与用法</div>
+      <div class="card-body" data-page-node-id="WkGHCYxUYzoZsvNCxYOqYG">
+        <div class="sec-label" data-page-node-id="2RXk0mWB92jB0pgwl88p7h">释义</div>
+        <div class="desc-text" id="w-desc" data-page-node-id="8SMQ7jFq2wPPHABgmeQMC3"></div>
+        <div class="sec-label" data-page-node-id="2YDrqzuOAvzTqrByEuAPtt">示例</div>
+        <div class="code-block mono" id="w-example" data-page-node-id="BvhWVpf8mQA5vUTfqxaO0F"></div>
+        <div class="code-out mono" id="w-output" data-page-node-id="47WQH78SzvTIzcAMrLw2x2"></div>
+        <div id="w-params-wrap" data-page-node-id="8E5Hj6ZFUIYI3BfAto29VB"></div>
+      </div>
+    </div>
+  </div>
+  <div class="rate-row" data-page-node-id="aOUa4PPJ5kHmm053TAIpEs">
+    <button class="rate-btn rate-again" onclick="rate('again')" data-page-node-id="wKZlLSdhzWXEYfe4SMxRGC">不认识<small data-page-node-id="GYbHr6kqOdvq32Cuoo0joY">待会儿再来</small></button>
+    <button class="rate-btn rate-hard" onclick="rate('hard')" data-page-node-id="9JmCZ55Ay0z9jYOg3wMF9g">模糊<small data-page-node-id="khCDOdX7OG22esNgzyUCIO">稍后复习</small></button>
+    <button class="rate-btn rate-good" onclick="rate('good')" data-page-node-id="hSFz3WC6D6WhzsTUF0pMzM">认识<small data-page-node-id="ZnITL5O9RBWDdG49Qrlmx3">下一个</small></button>
+  </div>
+</div>
+
+<!-- ================= 完成 ================= -->
+<div class="screen" id="done" data-page-node-id="neLCecU9QcQY0SAMouO2qo">
+  <div class="done-badge" data-page-node-id="eitVvQKbVYcJvJMsz1lmnq">✓</div>
+  <div class="done-title serif" data-page-node-id="K3VCOidfiV7EPSkkQyrVEZ">本轮完成！</div>
+  <div class="done-sub" id="done-sub" data-page-node-id="J435gdtRQRwYxEqxNPPgZP"></div>
+  <div class="done-stats" data-page-node-id="vT0QzaRwjCgiKoEsuav2eY">
+    <div class="stat-chip" data-page-node-id="PTA6h5vYiETeTkOquJHgBH"><div class="num serif" id="done-good" style="color:var(--green)" data-page-node-id="BZL7mwbyx9uCAisl5CY1Ee">0</div><div class="lbl" data-page-node-id="tt6v2BxSiXGRCE1EvS384F">一次就认识</div></div>
+    <div class="stat-chip" data-page-node-id="qiOAV9AgvTcgz9eJSafNLo"><div class="num serif" id="done-review" style="color:var(--amber)" data-page-node-id="XDyv00Z93k9CZgiKbPxb8q">0</div><div class="lbl" data-page-node-id="EDEsuAKj2MIzqTiKjRRGRD">复习了才认识</div></div>
+  </div>
+  <div class="done-btns" data-page-node-id="BgEWM8ewjEfjINCiO9Pqtc">
+    <button class="btn-primary" onclick="startQuiz()" data-page-node-id="HySppP7E2W8F1Ey1gBpJBV">✍️ 去自测，检验一下</button>
+    <button class="btn-ghost" onclick="goHome()" data-page-node-id="8yDA9EIAEEGMgUE01l2ilg">返回首页</button>
+  </div>
+</div>
+
+<!-- ================= 自测 ================= -->
+<div class="screen" id="quiz" data-page-node-id="HVN7hWtzrbHdt17ubAuQ2B">
+  <div class="topbar" data-page-node-id="gQSosV2AVo5EPyOJRih8iH">
+    <button class="back-btn" onclick="goHome()" data-page-node-id="WHv8TpFVhG6yxW6zYKk8Dv">←</button>
+    <div class="progress-wrap" data-page-node-id="sldHAy4eWofMx9CX5SH3e1">
+      <div class="progress-info" data-page-node-id="0KG31aSbB3FDYPYBpazaMy"><span data-page-node-id="XVDAJgHzfJtFFQpCNFYkW1">自测 · 看用法选英文名</span><span id="quiz-count" data-page-node-id="Lg5t5OklFi5YD17IGYvYn5">1 / 10</span></div>
+      <div class="progress-track" data-page-node-id="xSXDrFBKoIvQ5Oq4pRPA76"><div class="progress-fill" id="quiz-progress" style="width:0%" data-page-node-id="96R4xELMRq5ye7t4Cw6gNE"></div></div>
+    </div>
+  </div>
+  <div class="quiz-score-line" id="quiz-score-line" data-page-node-id="IvBqWRltEuzcKvUqgF857x">答对 0 题</div>
+  <div class="quiz-zone" data-page-node-id="T7bBaylIFJV7GIg4QyDJUR">
+    <div class="quiz-card" data-page-node-id="4yhFeBfLENWON5AbcICrta">
+      <div class="quiz-q-label" id="q-kind" data-page-node-id="RFyjjODGDQP7kpMLRllkTR">这是什么函数 / 方法？</div>
+      <div class="quiz-desc" id="q-desc" data-page-node-id="lkZXRNd9WuQJxanCHguVY4"></div>
+      <div class="quiz-example locked" id="q-example-wrap" data-page-node-id="Um7hJYzjPXQRvjW57YGrEC">
+        <div class="lock-hint">▸ 示例已折叠，选出英文名后自动展开对照</div>
+        <div class="code-block mono" id="q-example" data-page-node-id="yEvMxASyBw3ITgbvrBCRR9"></div>
+        <div class="code-out mono" id="q-output" data-page-node-id="QzI1Uf3UTemFThaw2yIM8n"></div>
+      </div>
+    </div>
+  </div>
+  <div class="opt-list" id="opt-list" data-page-node-id="PLzVsOOzccSk6ZRSarY6Ax"></div>
+</div>
+
+<!-- ================= 自测结果 ================= -->
+<div class="screen" id="quiz-done" data-page-node-id="mzYdR3z4QF2uzLOAYnxGwK">
+  <div class="done-badge" id="qd-badge" data-page-node-id="RWorRh9NiZsGAyVOattsXj">🏆</div>
+  <div class="done-title serif" id="qd-title" data-page-node-id="WuZ0by3sjWzQ8owU6Z1DlD">10 / 10</div>
+  <div class="done-sub" id="qd-sub" data-page-node-id="EkrPHIJg3CZ2AiukjrLPZ2"></div>
+  <div class="done-btns" style="margin-top:30px" data-page-node-id="9TVHTFPUojifp4Nhbi27wf">
+    <button class="btn-primary" onclick="startQuiz()" data-page-node-id="Q2FV79c5CCSAEZwVqpm9Wa">再来一轮</button>
+    <button class="btn-ghost" onclick="goHome()" data-page-node-id="1bMT8ovSDRqyDxvXFaJ3AO">返回首页</button>
+  </div>
+</div>
+
+<script>
+/* ==================== 词库 ==================== */
+const BUILTINS=[
+{n:'print',c:'输入输出',d:'将对象打印到文本流（默认是控制台），可指定分隔符、结束符、输出文件等。',s:'print(*objects, sep=" ", end="\\n", file=sys.stdout, flush=False)',p:[['*objects','任意对象','无','要打印的一个或多个对象，用逗号分隔'],['sep','str','" "','多个对象之间的分隔符，默认为一个空格'],['end','str','"\\n"','打印结束时的附加字符串，默认为换行符'],['file','文件对象','sys.stdout','指定输出目标，可以是文件或任何支持 write() 的对象'],['flush','bool','False','是否立即刷新输出缓冲区']],ex:`print("Hello, world!")
+print(1, 2, 3, sep='-', end='!')`,out:`Hello, world!
+1-2-3!`},
+{n:'input',c:'输入输出',d:'从标准输入读取一行文本，并作为字符串返回（不含换行符）。可提供提示字符串。',s:'input(prompt=None)',p:[['prompt','str','None','可选的提示信息，会在等待输入前打印']],ex:`name = input("请输入你的名字: ")
+print("你好,", name)`,out:`请输入你的名字: 小明
+你好, 小明`},
+{n:'int',c:'类型转换',d:'将数字或字符串转换为整数。可指定进制（默认10）。如果转换失败会引发 ValueError。',s:'int(x, base=10)',p:[['x','数字或字符串','必需','要转换的数字或字符串'],['base','int','10','进制基数（2~36），仅在 x 为字符串时有效']],ex:`print(int("123"))
+print(int(3.99))
+print(int("FF", 16))`,out:`123
+3
+255`},
+{n:'float',c:'类型转换',d:'将数字或字符串转换为浮点数。',s:'float(x)',p:[['x','数字或字符串','必需','要转换的数字或字符串（如 "3.14"）']],ex:`print(float("3.14"))
+print(float(5))`,out:`3.14
+5.0`},
+{n:'str',c:'类型转换',d:'将对象转换为字符串表示，通常用于打印或拼接。',s:'str(object)',p:[['object','任意对象','必需','要转换为字符串的对象']],ex:`print(str(123))
+print(str([1,2,3]))`,out:`123
+[1, 2, 3]`},
+{n:'bool',c:'类型转换',d:'将值转换为布尔值（True 或 False）。遵循 Python 的真值测试规则。',s:'bool(x)',p:[['x','任意值','必需','要转换的值。空序列、0、None 等为 False，其余为 True']],ex:`print(bool(0))
+print(bool(5))
+print(bool(""))`,out:`False
+True
+False`},
+{n:'list',c:'类型转换',d:'从可迭代对象创建列表。若参数为空则创建空列表。',s:'list(iterable)',p:[['iterable','可迭代对象','可选','任何可迭代对象（字符串、元组、集合等），若不传则创建空列表']],ex:`print(list("abc"))
+print(list(range(5)))`,out:`['a', 'b', 'c']
+[0, 1, 2, 3, 4]`},
+{n:'tuple',c:'类型转换',d:'从可迭代对象创建元组。',s:'tuple(iterable)',p:[['iterable','可迭代对象','可选','可迭代对象，若不传则创建空元组']],ex:`print(tuple("abc"))
+print(tuple([1,2,3]))`,out:`('a', 'b', 'c')
+(1, 2, 3)`},
+{n:'dict',c:'类型转换',d:'从键值对序列或关键字参数创建字典。',s:'dict(iterable, **kwarg)',p:[['iterable','可迭代对象','可选','键值对序列（如 [(k,v)]）或关键字参数'],['**kwarg','关键字参数','可选','直接以 key=value 形式传入']],ex:`print(dict(a=1, b=2))
+print(dict([("x",10), ("y",20)]))`,out:`{'a': 1, 'b': 2}
+{'x': 10, 'y': 20}`},
+{n:'set',c:'类型转换',d:'从可迭代对象创建集合（去重，无序）。',s:'set(iterable)',p:[['iterable','可迭代对象','可选','可迭代对象，若不传则创建空集合']],ex:`print(set([1,2,2,3]))
+print(set("hello"))`,out:`{1, 2, 3}
+{'h', 'e', 'l', 'o'}`},
+{n:'abs',c:'数学',d:'返回数字的绝对值（非负值）。',s:'abs(x)',p:[['x','数字','必需','数值，若为复数则返回模长']],ex:`print(abs(-5))
+print(abs(3.14))`,out:`5
+3.14`},
+{n:'round',c:'数学',d:'将数字四舍五入到指定小数位数（默认为0）。',s:'round(number, ndigits=None)',p:[['number','数字','必需','要舍入的数字'],['ndigits','int','None','保留的小数位数，若为 None 则返回整数']],ex:`print(round(3.14159, 2))
+print(round(3.5))`,out:`3.14
+4`},
+{n:'pow',c:'数学',d:'返回 x 的 y 次方。若有第三个参数 z，则返回 (x**y) % z（取模幂）。',s:'pow(x, y, z=None)',p:[['x','数字','必需','底数'],['y','数字','必需','指数'],['z','数字','None','可选模数，若提供则执行模幂运算']],ex:`print(pow(2, 3))
+print(pow(2, 3, 5))`,out:`8
+3`},
+{n:'sum',c:'数学',d:'对可迭代对象中的元素求和，可指定起始值（默认0）。',s:'sum(iterable, start=0)',p:[['iterable','可迭代对象（数字）','必需','包含数字的可迭代对象'],['start','数字','0','求和的初始值，最终结果 = start + sum(iterable)']],ex:`print(sum([1,2,3,4]))
+print(sum([1,2,3], 10))`,out:`10
+16`},
+{n:'max',c:'数学',d:'返回可迭代对象中的最大值，或返回多个参数中的最大值。可指定 key 函数和默认值。',s:'max(iterable, *args, key=None, default=None)',p:[['iterable','可迭代对象','必需（之一）','可迭代对象（如列表）'],['*args','多个值','可选','多个数值作为比较对象'],['key','函数','None','用于提取比较键的函数'],['default','任意值','None','当 iterable 为空时返回的默认值']],ex:`print(max(1, 5, 3))
+print(max([2, 7, 1]))`,out:`5
+7`},
+{n:'min',c:'数学',d:'返回可迭代对象中的最小值，或返回多个参数中的最小值。',s:'min(iterable, *args, key=None, default=None)',p:[['iterable','可迭代对象','必需（之一）','可迭代对象'],['*args','多个值','可选','多个数值作为比较对象'],['key','函数','None','用于提取比较键的函数'],['default','任意值','None','当 iterable 为空时返回的默认值']],ex:`print(min(1, 5, 3))
+print(min([2, 7, 1]))`,out:`1
+1`},
+{n:'divmod',c:'数学',d:'返回 (商, 余数) 的元组，用于整数除法。',s:'divmod(a, b)',p:[['a','数字','必需','被除数'],['b','数字','必需','除数（不能为 0）']],ex:`print(divmod(10, 3))
+print(divmod(8, 2))`,out:`(3, 1)
+(4, 0)`},
+{n:'len',c:'序列',d:'返回序列或集合的元素个数。',s:'len(s)',p:[['s','序列或集合','必需','支持 len() 的对象（字符串、列表、元组、字典、集合等）']],ex:`print(len("hello"))
+print(len([1,2,3,4]))`,out:`5
+4`},
+{n:'range',c:'序列',d:'返回一个不可变的数字序列，常用于 for 循环。',s:'range(start, stop, step)',p:[['start','int','0','起始值（包含），默认为 0'],['stop','int','必需','终止值（不包含）'],['step','int','1','步长，默认为 1，可以为负数']],ex:`print(list(range(5)))
+print(list(range(2,8,2)))`,out:`[0, 1, 2, 3, 4]
+[2, 4, 6]`},
+{n:'sorted',c:'序列',d:'返回对可迭代对象排序后的新列表，不会修改原对象。',s:'sorted(iterable, key=None, reverse=False)',p:[['iterable','可迭代对象','必需','待排序的可迭代对象'],['key','函数','None','用于提取比较键的函数（如 lambda x: x[1]）'],['reverse','bool','False','若为 True，则降序排序']],ex:`print(sorted([3,1,4,2]))
+print(sorted("python"))`,out:`[1, 2, 3, 4]
+['h', 'n', 'o', 'p', 't', 'y']`},
+{n:'reversed',c:'序列',d:'返回反向迭代器，反转序列元素顺序。',s:'reversed(seq)',p:[['seq','序列','必需','支持长度和索引的序列（如列表、元组、字符串）']],ex:`print(list(reversed([1,2,3])))
+print(''.join(reversed("abc")))`,out:`[3, 2, 1]
+cba`},
+{n:'enumerate',c:'序列',d:'返回枚举对象，每次迭代产生 (索引, 值) 元组。',s:'enumerate(iterable, start=0)',p:[['iterable','可迭代对象','必需','要枚举的可迭代对象'],['start','int','0','起始索引值，默认为 0']],ex:`print(list(enumerate(['a','b','c'])))`,out:`[(0, 'a'), (1, 'b'), (2, 'c')]`},
+{n:'zip',c:'序列',d:'将多个可迭代对象对应位置的元素打包为元组，返回迭代器。',s:'zip(*iterables)',p:[['*iterables','可迭代对象','必需','一个或多个可迭代对象，按最短长度截断']],ex:`print(list(zip([1,2], ['a','b'])))`,out:`[(1, 'a'), (2, 'b')]`},
+{n:'all',c:'序列',d:'如果可迭代对象中所有元素都为 True，则返回 True。等价于 and 操作。',s:'all(iterable)',p:[['iterable','可迭代对象','必需','包含布尔值的可迭代对象']],ex:`print(all([True, True]))
+print(all([True, False]))`,out:`True
+False`},
+{n:'any',c:'序列',d:'如果可迭代对象中至少有一个元素为 True，则返回 True。等价于 or 操作。',s:'any(iterable)',p:[['iterable','可迭代对象','必需','包含布尔值的可迭代对象']],ex:`print(any([False, True]))
+print(any([False, False]))`,out:`True
+False`},
+{n:'map',c:'高阶函数',d:'将函数应用于可迭代对象的每个元素，返回迭代器。',s:'map(func, *iterables)',p:[['func','函数','必需','接受一个或多个参数的函数'],['*iterables','可迭代对象','必需','一个或多个可迭代对象，长度匹配']],ex:`print(list(map(lambda x: x*2, [1,2,3])))`,out:`[2, 4, 6]`},
+{n:'filter',c:'高阶函数',d:'过滤可迭代对象，只保留函数返回 True 的元素，返回迭代器。',s:'filter(func, iterable)',p:[['func','函数','必需','接受一个参数并返回布尔值的函数，若为 None 则过滤掉假值'],['iterable','可迭代对象','必需','要过滤的可迭代对象']],ex:`print(list(filter(lambda x: x>2, [1,2,3,4])))`,out:`[3, 4]`},
+{n:'type',c:'对象',d:'返回对象的类型（类）。',s:'type(object)',p:[['object','任意对象','必需','要查询类型的对象']],ex:`print(type(123))
+print(type("abc"))`,out:`<class 'int'>
+<class 'str'>`},
+{n:'isinstance',c:'对象',d:'检查对象是否是指定类型（或其子类）的实例。',s:'isinstance(obj, classinfo)',p:[['obj','任意对象','必需','要检查的对象'],['classinfo','类型或类型元组','必需','一个类（或类元组），如 int, (int, float)']],ex:`print(isinstance(5, int))
+print(isinstance("hi", str))`,out:`True
+True`},
+{n:'dir',c:'对象',d:'返回对象的所有属性和方法的列表，若不带参数则返回当前作用域的名称。',s:'dir(object)',p:[['object','任意对象','可选','要查看属性的对象，若不传则返回当前局部作用域的名称']],ex:`print(dir(int))   # 列出 int 类型的方法`,out:`['__abs__', '__add__', ...]`},
+{n:'help',c:'对象',d:'在交互式环境中显示对象的帮助信息，或进入帮助系统。',s:'help(object)',p:[['object','任意对象','可选','要获取帮助的对象，若不传则启动交互式帮助']],ex:`help(print)   # 显示 print 函数的帮助`,out:`（显示帮助信息，此处省略）`},
+{n:'open',c:'文件',d:'打开文件并返回文件对象，用于读写。注意要配合 close() 或 with 语句。',s:'open(file, mode="r", encoding=None, ...)',p:[['file','str','必需','文件路径（字符串）'],['mode','str','"r"','打开模式：r（读）、w（写）、a（追加）、b（二进制）、+（更新）等'],['encoding','str','None','文本模式下的编码（如 utf-8）']],ex:`f = open("test.txt", "w", encoding="utf-8")
+f.write("Hello")
+f.close()`,out:`（文件操作无直接输出）`}
+];
+
+const STRMETHODS=[
+{n:'upper',c:'大小写',d:'返回字符串的副本，所有字符转换为大写。',s:'str.upper()',p:[],ex:`text = "Hello World"
+print(text.upper())`,out:`HELLO WORLD`},
+{n:'lower',c:'大小写',d:'返回字符串的副本，所有字符转换为小写。',s:'str.lower()',p:[],ex:`text = "Hello World"
+print(text.lower())`,out:`hello world`},
+{n:'title',c:'大小写',d:'返回标题化字符串，每个单词首字母大写，其余小写。',s:'str.title()',p:[],ex:`text = "hello world"
+print(text.title())`,out:`Hello World`},
+{n:'capitalize',c:'大小写',d:'返回字符串副本，仅第一个字符大写，其余小写。',s:'str.capitalize()',p:[],ex:`text = "hello WORLD"
+print(text.capitalize())`,out:`Hello world`},
+{n:'swapcase',c:'大小写',d:'返回字符串副本，大写变小写，小写变大写。',s:'str.swapcase()',p:[],ex:`text = "Hello World"
+print(text.swapcase())`,out:`hELLO wORLD`},
+{n:'casefold',c:'大小写',d:'返回适合无大小写比较的字符串版本，比 lower() 更激进。',s:'str.casefold()',p:[],ex:`text = "Hello World"
+print(text.casefold())`,out:`hello world`},
+{n:'find',c:'查找',d:'返回子字符串首次出现的索引，找不到返回 -1。可指定开始和结束位置。',s:'str.find(sub[, start[, end]])',p:[['sub','str','必需','要查找的子字符串'],['start','int','0','开始搜索的索引（包含）'],['end','int','len(str)','结束搜索的索引（不包含）']],ex:`text = "Hello World"
+print(text.find("World"))
+print(text.find("Python"))`,out:`6
+-1`},
+{n:'rfind',c:'查找',d:'返回子字符串最后一次出现的索引，找不到返回 -1。',s:'str.rfind(sub[, start[, end]])',p:[['sub','str','必需','要查找的子字符串'],['start','int','0','开始搜索的索引'],['end','int','len(str)','结束搜索的索引']],ex:`text = "Hello Hello"
+print(text.rfind("Hello"))`,out:`6`},
+{n:'index',c:'查找',d:'类似 find()，但找不到时引发 ValueError。',s:'str.index(sub[, start[, end]])',p:[['sub','str','必需','要查找的子字符串'],['start','int','0','开始搜索的索引'],['end','int','len(str)','结束搜索的索引']],ex:`text = "Hello World"
+print(text.index("World"))`,out:`6`},
+{n:'replace',c:'替换',d:'返回字符串副本，将所有 old 替换为 new，可指定替换次数。',s:'str.replace(old, new[, count])',p:[['old','str','必需','要被替换的子字符串'],['new','str','必需','替换后的新字符串'],['count','int','全部','最大替换次数，默认替换所有出现']],ex:`text = "Hello World"
+print(text.replace("World", "Python"))
+print(text.replace("l", "L", 2))`,out:`Hello Python
+HeLLo World`},
+{n:'count',c:'查找',d:'统计子字符串在字符串中出现的非重叠次数。',s:'str.count(sub[, start[, end]])',p:[['sub','str','必需','要统计的子字符串'],['start','int','0','开始搜索的索引'],['end','int','len(str)','结束搜索的索引']],ex:`text = "banana"
+print(text.count("a"))
+print(text.count("an"))`,out:`3
+2`},
+{n:'startswith',c:'查找',d:'检查字符串是否以指定前缀开头，返回布尔值。',s:'str.startswith(prefix[, start[, end]])',p:[['prefix','str 或 tuple','必需','要检查的前缀，可以是字符串或字符串元组'],['start','int','0','开始检查的索引'],['end','int','len(str)','结束检查的索引']],ex:`text = "Hello World"
+print(text.startswith("Hello"))
+print(text.startswith(("Hi", "Hello")))`,out:`True
+True`},
+{n:'endswith',c:'查找',d:'检查字符串是否以指定后缀结尾，返回布尔值。',s:'str.endswith(suffix[, start[, end]])',p:[['suffix','str 或 tuple','必需','要检查的后缀，可以是字符串或字符串元组'],['start','int','0','开始检查的索引'],['end','int','len(str)','结束检查的索引']],ex:`text = "Hello World"
+print(text.endswith("World"))
+print(text.endswith(("Python", "World")))`,out:`True
+True`},
+{n:'strip',c:'修剪',d:'返回字符串副本，移除两端指定的字符（默认为空白字符）。',s:'str.strip([chars])',p:[['chars','str','None','要移除的字符集合，默认移除空白字符（空格、换行等）']],ex:`text = "  Hello World  "
+print(text.strip())
+print("xxHelloxx".strip("x"))`,out:`Hello World
+Hello`},
+{n:'lstrip',c:'修剪',d:'移除字符串左侧的指定字符（默认为空白字符）。',s:'str.lstrip([chars])',p:[['chars','str','None','要移除的字符集合']],ex:`text = "  Hello  "
+print(text.lstrip())`,out:`Hello  `},
+{n:'rstrip',c:'修剪',d:'移除字符串右侧的指定字符（默认为空白字符）。',s:'str.rstrip([chars])',p:[['chars','str','None','要移除的字符集合']],ex:`text = "  Hello  "
+print(text.rstrip())`,out:`  Hello`},
+{n:'center',c:'填充',d:'返回指定宽度的居中字符串，两侧用 fillchar 填充（默认为空格）。',s:'str.center(width[, fillchar])',p:[['width','int','必需','结果字符串的总宽度'],['fillchar','str','空格','填充字符，只能是单个字符']],ex:`print("Hello".center(11, "*"))`,out:`***Hello***`},
+{n:'ljust',c:'填充',d:'返回左对齐的字符串，右侧用 fillchar 填充至指定宽度。',s:'str.ljust(width[, fillchar])',p:[['width','int','必需','结果字符串的总宽度'],['fillchar','str','空格','填充字符']],ex:`print("Hello".ljust(8, "-"))`,out:`Hello---`},
+{n:'rjust',c:'填充',d:'返回右对齐的字符串，左侧用 fillchar 填充至指定宽度。',s:'str.rjust(width[, fillchar])',p:[['width','int','必需','结果字符串的总宽度'],['fillchar','str','空格','填充字符']],ex:`print("Hello".rjust(8, "-"))`,out:`---Hello`},
+{n:'zfill',c:'填充',d:'返回字符串副本，左侧填充 0 至指定宽度，常用于数字格式化。',s:'str.zfill(width)',p:[['width','int','必需','结果字符串的总宽度']],ex:`print("42".zfill(5))
+print("-42".zfill(5))`,out:`00042
+-0042`},
+{n:'split',c:'拆分',d:'使用指定分隔符将字符串拆分为列表，可指定最大拆分次数。',s:'str.split(sep=None, maxsplit=-1)',p:[['sep','str','None','分隔符，默认按空白字符拆分（连续空白视为一个）'],['maxsplit','int','-1','最大拆分次数，-1 表示不限次数']],ex:`text = "Hello World Python"
+print(text.split())
+print(text.split(" ", 1))`,out:`['Hello', 'World', 'Python']
+['Hello', 'World Python']`},
+{n:'rsplit',c:'拆分',d:'从右侧开始拆分字符串，与 split() 类似但方向相反。',s:'str.rsplit(sep=None, maxsplit=-1)',p:[['sep','str','None','分隔符'],['maxsplit','int','-1','最大拆分次数']],ex:`text = "Hello World Python"
+print(text.rsplit(" ", 1))`,out:`['Hello World', 'Python']`},
+{n:'splitlines',c:'拆分',d:'按行拆分字符串，返回行列表。',s:'str.splitlines([keepends])',p:[['keepends','bool','False','是否保留行尾的换行符']],ex:`text = "line1\\nline2\\nline3"
+print(text.splitlines())`,out:`['line1', 'line2', 'line3']`},
+{n:'join',c:'合并',d:'将可迭代对象中的字符串用指定分隔符连接成一个字符串。',s:'str.join(iterable)',p:[['iterable','可迭代对象（字符串）','必需','包含字符串的可迭代对象']],ex:`parts = ["Hello", "World", "Python"]
+print(" ".join(parts))
+print("-".join(["a", "b", "c"]))`,out:`Hello World Python
+a-b-c`},
+{n:'partition',c:'拆分',d:'在第一个分隔符处拆分字符串，返回 (前, 分隔符, 后) 三元组。',s:'str.partition(sep)',p:[['sep','str','必需','分隔符']],ex:`text = "Hello World"
+print(text.partition(" "))`,out:`('Hello', ' ', 'World')`},
+{n:'rpartition',c:'拆分',d:'在最后一个分隔符处拆分字符串，返回 (前, 分隔符, 后) 三元组。',s:'str.rpartition(sep)',p:[['sep','str','必需','分隔符']],ex:`text = "Hello World Python"
+print(text.rpartition(" "))`,out:`('Hello World', ' ', 'Python')`},
+{n:'isalpha',c:'判断',d:'检查字符串是否全部由字母组成且至少有一个字符。',s:'str.isalpha()',p:[],ex:`print("Hello".isalpha())
+print("Hello123".isalpha())`,out:`True
+False`},
+{n:'isdigit',c:'判断',d:'检查字符串是否全部由数字组成且至少有一个字符。',s:'str.isdigit()',p:[],ex:`print("123".isdigit())
+print("12.3".isdigit())`,out:`True
+False`},
+{n:'isalnum',c:'判断',d:'检查字符串是否全部由字母或数字组成且至少有一个字符。',s:'str.isalnum()',p:[],ex:`print("Hello123".isalnum())
+print("Hello 123".isalnum())`,out:`True
+False`},
+{n:'isspace',c:'判断',d:'检查字符串是否全部由空白字符组成且至少有一个字符。',s:'str.isspace()',p:[],ex:`print("   ".isspace())
+print(" a ".isspace())`,out:`True
+False`},
+{n:'islower',c:'判断',d:'检查字符串是否至少有一个可区分大小写的字符且全部为小写。',s:'str.islower()',p:[],ex:`print("hello".islower())
+print("Hello".islower())`,out:`True
+False`},
+{n:'isupper',c:'判断',d:'检查字符串是否至少有一个可区分大小写的字符且全部为大写。',s:'str.isupper()',p:[],ex:`print("HELLO".isupper())
+print("Hello".isupper())`,out:`True
+False`},
+{n:'istitle',c:'判断',d:'检查字符串是否为标题化（每个单词首字母大写，其余小写）。',s:'str.istitle()',p:[],ex:`print("Hello World".istitle())
+print("Hello world".istitle())`,out:`True
+False`},
+{n:'isnumeric',c:'判断',d:'检查字符串是否全部由数字字符组成（包括 Unicode 数字）。',s:'str.isnumeric()',p:[],ex:`print("123".isnumeric())
+print("½".isnumeric())`,out:`True
+True`},
+{n:'isdecimal',c:'判断',d:'检查字符串是否全部由十进制数字字符组成。',s:'str.isdecimal()',p:[],ex:`print("123".isdecimal())
+print("½".isdecimal())`,out:`True
+False`},
+{n:'isascii',c:'判断',d:'检查字符串是否全部由 ASCII 字符组成（空字符串返回 True）。',s:'str.isascii()',p:[],ex:`print("Hello".isascii())
+print("你好".isascii())`,out:`True
+False`},
+{n:'format',c:'格式化',d:'执行字符串格式化，使用 {} 占位符和 : 格式规范。',s:'str.format(*args, **kwargs)',p:[['*args','任意','可选','位置参数，用于替换 {} 占位符'],['**kwargs','关键字参数','可选','关键字参数，用于替换 {name} 占位符']],ex:`print("Hello, {}!".format("World"))
+print("{name} is {age}".format(name="Alice", age=25))`,out:`Hello, World!
+Alice is 25`},
+{n:'format_map',c:'格式化',d:'类似 format()，但参数以映射（字典）形式提供。',s:'str.format_map(mapping)',p:[['mapping','字典','必需','包含占位符对应值的字典']],ex:`data = {"name": "Bob", "age": 30}
+print("{name} is {age}".format_map(data))`,out:`Bob is 30`},
+{n:'encode',c:'编码',d:'将字符串编码为字节对象，可指定编码格式和错误处理。',s:'str.encode(encoding="utf-8", errors="strict")',p:[['encoding','str','"utf-8"','编码格式，如 "utf-8", "gbk"'],['errors','str','"strict"','错误处理策略，如 "ignore", "replace"']],ex:`text = "Hello"
+print(text.encode("utf-8"))
+print(text.encode("ascii"))`,out:`b'Hello'
+b'Hello'`},
+{n:'expandtabs',c:'格式化',d:'将字符串中的制表符 \\t 替换为空格，可指定制表符宽度。',s:'str.expandtabs(tabsize=8)',p:[['tabsize','int','8','制表符替换为多少个空格']],ex:`text = "Hello\\tWorld"
+print(text.expandtabs(4))`,out:`Hello   World`},
+{n:'maketrans',c:'映射',d:'创建字符映射转换表，常与 translate() 配合使用。',s:'str.maketrans(x[, y[, z]])',p:[['x','str 或 dict','必需','如果为字典，则键值对表示映射关系；如果为字符串，则与 y 配合'],['y','str','可选','与 x 等长，x 中字符映射到 y 中对应字符'],['z','str','可选','要删除的字符集合']],ex:`trans = str.maketrans("abc", "123")
+print("aabbcc".translate(trans))`,out:`112233`},
+{n:'translate',c:'映射',d:'根据转换表映射字符串中的字符。',s:'str.translate(table)',p:[['table','转换表','必需','由 maketrans() 创建的转换表']],ex:`trans = str.maketrans("abc", "123")
+print("aabbcc".translate(trans))`,out:`112233`},
+{n:'removeprefix',c:'修剪',d:'如果字符串以指定前缀开头，则移除它，否则返回原字符串。',s:'str.removeprefix(prefix)',p:[['prefix','str','必需','要移除的前缀']],ex:`text = "HelloWorld"
+print(text.removeprefix("Hello"))
+print(text.removeprefix("World"))`,out:`World
+HelloWorld`},
+{n:'removesuffix',c:'修剪',d:'如果字符串以指定后缀结尾，则移除它，否则返回原字符串。',s:'str.removesuffix(suffix)',p:[['suffix','str','必需','要移除的后缀']],ex:`text = "HelloWorld"
+print(text.removesuffix("World"))
+print(text.removesuffix("Hello"))`,out:`Hello
+HelloWorld`}
+];
+
+const ALL=[...BUILTINS.map(x=>({...x,k:'内置函数'})),...STRMETHODS.map(x=>({...x,k:'字符串方法'}))];
+
+/* ==================== 工具 ==================== */
+const $=id=>document.getElementById(id);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* 不保留任何本地进度：每次打开都是全新的随机顺序 */
+function refreshHome(){
+  const b=ALL.filter(x=>x.k==='内置函数'),s=ALL.filter(x=>x.k==='字符串方法');
+  $('stat-total').textContent=ALL.length;
+  $('stat-known').textContent=b.length;
+  $('stat-pct').innerHTML=s.length+'<small>个</small>';
+  $('meta-builtin').textContent='共 '+b.length+' 张 · 每次随机乱序';
+  $('meta-str').textContent='共 '+s.length+' 张 · 每次随机乱序';
+  $('meta-all').textContent='共 '+ALL.length+' 张 · 每次随机乱序';
+  $('bar-builtin').style.width=Math.round(b.length/ALL.length*100)+'%';
+  $('bar-str').style.width=Math.round(s.length/ALL.length*100)+'%';
+  $('bar-all').style.width='100%';
+}
+
+function goHome(){refreshHome();show('home')}
+
+/* ==================== 学习模式 ==================== */
+let S=null; // session
+function startStudy(kind){
+  let pool;
+  if(kind==='builtin')pool=ALL.filter(x=>x.k==='内置函数');
+  else if(kind==='str')pool=ALL.filter(x=>x.k==='字符串方法');
+  else pool=ALL.slice();
+  // 每次进入都全量随机，不依赖任何历史记录
+  const queue=shuffle(pool.slice());
+  S={queue,total:queue.length,graduated:new Set(),firstTryGood:0,needReview:0,cur:null,curRevealed:false,
+     name:kind==='builtin'?'内置函数':kind==='str'?'字符串方法':'混合复习'};
+  $('study-deck-name').textContent='学习 · '+S.name;
+  show('study');
+  nextCard();
+}
+function nextCard(){
+  if(S.queue.length===0){finishStudy();return}
+  S.cur=S.queue.shift();
+  S.curRevealed=false;
+  const w=S.cur;
+  const card=$('word-card');
+  card.classList.remove('revealed');
+  card.style.animation='none';void card.offsetWidth;card.style.animation='';
+  $('w-kind').textContent=w.k;
+  $('w-name').textContent=w.n;
+  $('w-cat').textContent='分类 · '+w.c;
+  $('w-syntax').textContent=w.s;
+  $('w-desc').textContent=w.d;
+  $('w-example').textContent=w.ex;
+  $('w-output').textContent='▶ '+w.out;
+  const pw=$('w-params-wrap');
+  if(w.p&&w.p.length){
+    let h='<div class="sec-label">参数</div><table class="param-table mono"><tr><th>参数</th><th>默认</th><th>说明</th></tr>';
+    w.p.forEach(r=>{h+=`<tr><td>${esc(r[0])}</td><td>${esc(r[2])}</td><td style="font-family:-apple-system,'PingFang SC',sans-serif">${esc(r[3])}</td></tr>`});
+    pw.innerHTML=h+'</table>';
+  }else{pw.innerHTML=''}
+  updateProgress();
+}
+function revealCard(){if(S){S.curRevealed=true;$('word-card').classList.add('revealed')}}
+function updateProgress(){
+  $('study-count').textContent=S.graduated.size+' / '+S.total;
+  $('study-progress').style.width=(S.graduated.size/S.total*100)+'%';
+}
+function rate(grade){
+  if(!S||!S.cur)return;
+  const w=S.cur;
+  try{
+    if(grade==='good'){
+      if(!S.graduated.has(w.k+':'+w.n)&&S.curRevealed!==null){
+        if(S.queue.indexOf(w)===-1&&!w._retry)S.firstTryGood++;else S.needReview++;
+      }
+      S.graduated.add(w.k+':'+w.n);
+    }else{
+      w._retry=true;
+      // 不认识 → 隔 2 张再见；模糊 → 隔 4 张再见
+      const gap=grade==='again'?2:4;
+      const pos=Math.min(gap,S.queue.length);
+      S.queue.splice(pos,0,w);
+      if(grade==='again'&&!S.curRevealed)revealCard();
+    }
+  }catch(e){
+    // 任何异常都不能阻断翻卡
+  }
+  nextCard();
+}
+function finishStudy(){
+  $('done-sub').innerHTML=`「${S.name}」${S.total} 张词卡全部过完。刷新页面即可重新随机再来一轮。`;
+  $('done-good').textContent=S.firstTryGood;
+  $('done-review').textContent=S.total-S.firstTryGood;
+  show('done');
+  refreshHome();
+}
+
+/* ==================== 自测模式 ==================== */
+const QN=10;
+let Q=null;
+function startQuiz(){
+  const items=shuffle(ALL.slice()).slice(0,QN);
+  Q={items,idx:0,score:0,locked:false};
+  show('quiz');
+  nextQuestion();
+}
+function nextQuestion(){
+  if(Q.idx>=QN){finishQuiz();return}
+  const w=Q.items[Q.idx];
+  Q.locked=false;
+  $('quiz-count').textContent=(Q.idx+1)+' / '+QN;
+  $('quiz-progress').style.width=(Q.idx/QN*100)+'%';
+  $('quiz-score-line').textContent='答对 '+Q.score+' 题';
+  $('q-kind').textContent=(w.k==='内置函数'?'这是哪个内置函数？':'这是哪个字符串方法？');
+  $('q-desc').textContent=w.d;
+  $('q-example').textContent=w.ex;
+  $('q-output').textContent='▶ '+w.out;
+  $('q-example-wrap').classList.add('locked'); // 答题前隐藏示例，避免直接看到答案
+  // 选项：同类优先
+  const sameKind=ALL.filter(x=>x.k===w.k&&x.n!==w.n);
+  const distract=shuffle(sameKind.slice()).slice(0,3).map(x=>x.n);
+  const opts=shuffle([w.n,...distract]);
+  const list=$('opt-list');list.innerHTML='';
+  opts.forEach(name=>{
+    const b=document.createElement('button');
+    b.className='opt-btn serif';
+    b.innerHTML=`<span>${name}</span><span class="suffix">${w.k==='内置函数'?'f(x)':'str.'+name+'()'}</span>`;
+    b.onclick=()=>answer(b,name,w.n);
+    list.appendChild(b);
+  });
+}
+function answer(btn,name,correct){
+  if(Q.locked)return;Q.locked=true;
+  const ok=name===correct;
+  if(ok)Q.score++;
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    const t=b.querySelector('span').textContent;
+    if(t===correct)b.classList.add('correct');
+    else if(b===btn)b.classList.add('wrong');
+  });
+  $('quiz-score-line').textContent='答对 '+Q.score+' 题';
+  $('q-example-wrap').classList.remove('locked'); // 答完展开示例，对照记忆
+  Q.idx++;
+  setTimeout(nextQuestion,ok?900:1800);
+}
+function finishQuiz(){
+  $('quiz-progress').style.width='100%';
+  const s=Q.score;
+  $('qd-badge').textContent=s>=9?'🏆':s>=6?'💪':'📖';
+  $('qd-title').textContent=s+' / '+QN;
+  $('qd-sub').textContent=s>=9?'太棒了！英文名和用法已经完全对上。':s>=6?'不错！错的那几个回去再刷一轮词卡。':'建议先回学习模式把词卡过一遍再来。';
+  show('quiz-done');
+}
+
+/* ============ 安装到手机桌面（PWA） ============ */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  const b=$('install-btn');if(b)b.style.display='block';
+});
+window.addEventListener('appinstalled',()=>{const b=$('install-btn');if(b)b.style.display='none'});
+function doInstall(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null})}
+}
+(function(){
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const standalone=window.navigator.standalone===true||!!(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+  if(isIOS&&!standalone){const t=$('install-tip');if(t)t.innerHTML='iPhone：点底部「分享」→「添加到主屏幕」，之后就能像 App 一样打开'}
+})();
+
+refreshHome();
+</script>
+</body>
+</html>

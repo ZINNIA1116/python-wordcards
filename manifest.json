@@ -1,0 +1,24 @@
+{
+  "name": "Python 词卡",
+  "short_name": "Python词卡",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5EFE4",
+  "theme_color": "#211E19",
+  "orientation": "portrait",
+  "description": "Python 内置函数与字符串方法记忆卡，仿不背单词学习模式",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
