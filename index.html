@@ -78,6 +78,33 @@ body::before{
 #install-tip{margin-top:8px;text-align:center;font-size:12px;color:var(--ink-faint);line-height:1.7}
 .reset-link{margin-top:auto;padding-top:34px;text-align:center;font-size:12.5px;color:var(--ink-faint);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
+/* ============ 今日任务 / 间隔重复（不背单词式） ============ */
+.today-card{background:linear-gradient(150deg,#2A261F,#423A2E);color:var(--paper);border-radius:22px;padding:22px 22px 18px;margin-top:26px;box-shadow:0 6px 22px rgba(33,30,25,.16)}
+.tc-top{display:flex;align-items:center;justify-content:space-between}
+.tc-title{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;opacity:.55}
+.tc-total{font-size:clamp(32px,9vw,42px);font-weight:700;line-height:1;margin-top:6px}
+.tc-total small{font-size:14px;font-weight:400;opacity:.6;margin-left:6px}
+.today-row{display:flex;gap:8px;margin-top:18px}
+.today-cell{flex:1;background:rgba(255,255,255,.09);border-radius:12px;padding:11px 6px;text-align:center}
+.today-cell .n{font-size:clamp(18px,5.2vw,22px);font-weight:700;line-height:1.1}
+.today-cell .n.due{color:#F2B84B}
+.today-cell .l{font-size:11px;opacity:.62;margin-top:3px;letter-spacing:.06em}
+.today-btn{margin-top:16px;width:100%;background:var(--paper);color:var(--ink);border:none;border-radius:16px;padding:16px;font-size:clamp(15px,4.4vw,17px);font-weight:700;cursor:pointer;touch-action:manipulation;transition:transform .15s ease}
+.today-btn:active{transform:scale(.97)}
+.today-btn:disabled{opacity:.5}
+.tc-note{margin-top:11px;text-align:center;font-size:11.5px;opacity:.6;line-height:1.65}
+.seg-row{display:flex;align-items:center;gap:10px;margin-top:14px}
+.seg-lbl{font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em}
+.seg{display:flex;gap:3px;background:var(--paper2);border-radius:11px;padding:3px}
+.seg button{border:none;background:transparent;color:var(--ink-soft);font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;touch-action:manipulation}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.word-lvl{font-size:12px;color:var(--ink-faint);margin-top:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.lvl-bar{display:inline-flex;gap:3px;align-items:center}
+.lvl-bar i{width:6px;height:6px;border-radius:50%;background:var(--hair);display:block}
+.lvl-bar i.on{background:var(--green)}
+.lvl-tag{background:var(--paper2);border-radius:6px;padding:3px 8px;font-size:11px;letter-spacing:.04em}
+#storage-tip{display:none;margin-top:12px;text-align:center;font-size:12px;color:var(--ink-soft);line-height:1.6}
+
 /* ============ STUDY ============ */
 .topbar{display:flex;align-items:center;gap:14px;padding:14px 18px 10px;flex-shrink:0}
 .back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--hair);background:var(--card);color:var(--ink-soft);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -181,11 +208,34 @@ body::before{
   <div class="home-inner" data-page-node-id="AyXkUGkRlJOtAaC7dOFjxY">
     <div class="brand-tag" data-page-node-id="6mEi0XDF5N007eGviV082a">Python Recite</div>
     <div class="home-title serif" data-page-node-id="F8gC31JBaNoAz47vfpGHxo">像背单词一样<br data-page-node-id="HMiAkkXxgb5cLgfMVvSRBD">记住 <em data-page-node-id="4KrZ4LHtrZSIZ3l1KYprHj">Python</em></div>
-    <div class="home-sub" data-page-node-id="MmGMm4yq8eAH1fUGZGRYRo">76 张词卡 · 内置函数 × 字符串方法<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">每次打开顺序都不同<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">看卡片回忆用法，认识就翻下一张，模糊就再来一遍。</div>
+    <div class="home-sub" data-page-node-id="MmGMm4yq8eAH1fUGZGRYRo">76 张词卡 · 内置函数 × 字符串方法<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">先复习到期词，再学新词；认识就升级、模糊就降级<br data-page-node-id="cQHtaWYSW1VbGhl6fmt9RA">系统按掌握程度自动安排下一次复习时间。</div>
+
+    <div class="today-card">
+      <div class="tc-top"><span class="tc-title">今日任务</span><span class="tc-title" id="tc-date"></span></div>
+      <div class="tc-total" id="tc-total">0<small>张</small></div>
+      <div class="today-row">
+        <div class="today-cell"><div class="n due" id="tc-due">0</div><div class="l">待复习</div></div>
+        <div class="today-cell"><div class="n" id="tc-new">0</div><div class="l">可新学</div></div>
+        <div class="today-cell"><div class="n" id="tc-done">0</div><div class="l">今日已学</div></div>
+      </div>
+      <button class="today-btn" id="tc-btn" onclick="startStudy('today')">开始学习</button>
+      <div class="tc-note" id="tc-note"></div>
+    </div>
+
+    <div class="seg-row">
+      <span class="seg-lbl">每日新词</span>
+      <div class="seg" id="seg-new">
+        <button data-n="10" onclick="setNewLimit(10)">10</button>
+        <button data-n="20" onclick="setNewLimit(20)">20</button>
+        <button data-n="30" onclick="setNewLimit(30)">30</button>
+        <button data-n="0" onclick="setNewLimit(0)">不限</button>
+      </div>
+    </div>
+
     <div class="stats-row" data-page-node-id="EK3FvO2ImyEpenQEEvFRXi">
       <div class="stat-chip" data-page-node-id="GQULZkK8tRqFlYiX9W8V66"><div class="num serif" id="stat-total" data-page-node-id="ABpJ1EFiDjESz7PnwwtKMg">0</div><div class="lbl" data-page-node-id="g2U4gC4fQJB94eHHymeHSJ">词卡总数</div></div>
-      <div class="stat-chip" data-page-node-id="I46h37vCVCYz7aUbxXL51Z"><div class="num serif" id="stat-known" style="color:var(--green)" data-page-node-id="kb4eulTWafBUdAaBn6HfFW">0</div><div class="lbl" data-page-node-id="yYDDtMCuGe9KC8bMDHORoM">内置函数</div></div>
-      <div class="stat-chip" data-page-node-id="77TVQZhDM5ToF95VJ8rwDB"><div class="num serif" id="stat-pct" data-page-node-id="H4k3aPnaXC0oPAzFnhii0Q">0<small data-page-node-id="QBuW0dwlbwSArzvS4q8Rwm">%</small></div><div class="lbl" data-page-node-id="vG0EyrHhy7SoT6s9lf8hs7">字符串方法</div></div>
+      <div class="stat-chip" data-page-node-id="I46h37vCVCYz7aUbxXL51Z"><div class="num serif" id="stat-known" style="color:var(--green)" data-page-node-id="kb4eulTWafBUdAaBn6HfFW">0</div><div class="lbl" data-page-node-id="yYDDtMCuGe9KC8bMDHORoM">已掌握</div></div>
+      <div class="stat-chip" data-page-node-id="77TVQZhDM5ToF95VJ8rwDB"><div class="num serif" id="stat-pct" data-page-node-id="H4k3aPnaXC0oPAzFnhii0Q">0<small data-page-node-id="QBuW0dwlbwSArzvS4q8Rwm">%</small></div><div class="lbl" data-page-node-id="vG0EyrHhy7SoT6s9lf8hs7">掌握率</div></div>
     </div>
     <div class="deck-card" onclick="startStudy('builtin')" data-page-node-id="ANYoKArrg3FMl8dDR0Rzvu">
       <div class="deck-kind" data-page-node-id="OCGcDqU61AzYVa55Lwtse9">Chapter 7 · 函数</div>
@@ -213,6 +263,8 @@ body::before{
     </button>
     <button id="install-btn" onclick="doInstall()" data-page-node-id="installBtn">📲 把词卡安装到手机桌面</button>
     <div id="install-tip" data-page-node-id="installTip"></div>
+    <div id="storage-tip">当前浏览器不能保存进度，本次学习结束后记录会丢失<br>建议用浏览器打开在线链接，或「添加到主屏幕」后再学</div>
+    <div class="reset-link" onclick="resetProgress()">清空学习记录，从头再来</div>
   </div>
 </div>
 
@@ -231,6 +283,7 @@ body::before{
         <div class="word-kind" id="w-kind" data-page-node-id="2MKmAb3qpLOajldUKv87HC"></div>
         <div class="word-name serif" id="w-name" data-page-node-id="qnZbFHkKr9qac728rOPFwW"></div>
         <div class="word-cat" id="w-cat" data-page-node-id="B6p53UlHMDFGhZqPfUFhmY"></div>
+        <div class="word-lvl" id="w-lvl"></div>
         <div class="word-syntax mono" id="w-syntax" data-page-node-id="BB2gmRuO7KE8dE1gsQJCsE"></div>
       </div>
       <div class="reveal-hint" data-page-node-id="JbD1MijqLFLFSJxyIxPw4f">👆 点击卡片查看释义与用法</div>
@@ -524,48 +577,187 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-/* 不保留任何本地进度：每次打开都是全新的随机顺序 */
-function refreshHome(){
-  const b=ALL.filter(x=>x.k==='内置函数'),s=ALL.filter(x=>x.k==='字符串方法');
-  $('stat-total').textContent=ALL.length;
-  $('stat-known').textContent=b.length;
-  $('stat-pct').innerHTML=s.length+'<small>个</small>';
-  $('meta-builtin').textContent='共 '+b.length+' 张 · 每次随机乱序';
-  $('meta-str').textContent='共 '+s.length+' 张 · 每次随机乱序';
-  $('meta-all').textContent='共 '+ALL.length+' 张 · 每次随机乱序';
-  $('bar-builtin').style.width=Math.round(b.length/ALL.length*100)+'%';
-  $('bar-str').style.width=Math.round(s.length/ALL.length*100)+'%';
-  $('bar-all').style.width='100%';
+/* ==================== 进度持久化：localStorage → Cookie → 内存（三级降级） ==================== */
+const LS_KEY='pyrecite_srs_v2';
+const CK_KEY='prs2';
+let LS_OK=true, CK_OK=true, MEM=null;
+try{localStorage.setItem('__p__','1');localStorage.removeItem('__p__')}catch(e){LS_OK=false}
+/* 探测必须用独立名字，不能占用业务 cookie 名（否则探测完清理会把已存进度一起删掉） */
+try{document.cookie='__p__=1;max-age=60;path=/';CK_OK=document.cookie.indexOf('__p__')>=0;document.cookie='__p__=;max-age=0;path=/'}catch(e){CK_OK=false}
+
+function rawGet(){
+  if(LS_OK){try{const v=localStorage.getItem(LS_KEY);if(v)return v}catch(e){LS_OK=false}}
+  if(CK_OK){try{const m=document.cookie.match(/(?:^|;\s*)prs2=([^;]*)/);if(m)return decodeURIComponent(m[1])}catch(e){CK_OK=false}}
+  return MEM;
+}
+function rawSet(s){
+  MEM=s;
+  if(LS_OK){try{localStorage.setItem(LS_KEY,s);return}catch(e){LS_OK=false}}
+  if(CK_OK){try{document.cookie=CK_KEY+'='+encodeURIComponent(s)+';max-age=31536000;path=/'}catch(e){CK_OK=false}}
+}
+function rawDel(){
+  MEM=null;
+  try{localStorage.removeItem(LS_KEY)}catch(e){}
+  try{document.cookie=CK_KEY+'=;max-age=0;path=/'}catch(e){}
 }
 
+/* ==================== 间隔重复（SRS）核心 ==================== */
+/* 等级 1~8 的下次复习间隔（分钟）：10分 → 30分 → 12时 → 1天 → 2天 → 4天 → 7天 → 15天 */
+const LV_GAP=[0,10,30,720,1440,2880,5760,10080,21600];
+const MAXL=8;
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+
+let DB=(function(){
+  const def={v:2,c:{},cfg:{nl:20},day:todayStr(),dn:0};
+  try{
+    const s=rawGet(); if(!s) return def;
+    const o=JSON.parse(s);
+    if(!o||o.v!==2||!o.c||typeof o.c!=='object') return def;
+    o.cfg=o.cfg||{nl:20};
+    if(o.day!==todayStr()){o.day=todayStr();o.dn=0}
+    return o;
+  }catch(e){return def}
+})();
+function saveDB(){try{rawSet(JSON.stringify(DB))}catch(e){}}
+
+function rec(i){return DB.c[i]}
+function lvlOf(i){const r=rec(i);return r?r[0]:0}
+function learned(i){return !!rec(i)}
+function mastered(i){return lvlOf(i)>=MAXL}
+function isDue(i){const r=rec(i);return !!r&&r[0]>0&&r[1]<=Date.now()}
+function applyGrade(i,grade){
+  const r=rec(i)||[0,0,0,0];
+  let l=r[0];
+  if(grade==='good')l=Math.min(MAXL,l+1);
+  else if(grade==='hard')l=Math.max(1,l-1);
+  else l=1;
+  const rg=(r[2]||0)+(grade==='good'?1:0);
+  const rw=(r[3]||0)+(grade!=='good'?1:0);
+  const gap=grade==='again'?0:((LV_GAP[Math.min(l,LV_GAP.length-1)]||0)*60000);
+  DB.c[i]=[l,Date.now()+gap,rg,rw];
+}
+function fmtGap(ms){
+  if(ms<=0)return '马上';
+  const h=ms/3600000;
+  if(h<1)return Math.max(1,Math.round(ms/60000))+' 分钟后';
+  if(h<24)return Math.round(h)+' 小时后';
+  return Math.round(h/24)+' 天后';
+}
+
+/* 词库 → 索引集 */
+function poolIdx(kind){
+  const out=[];
+  for(let i=0;i<ALL.length;i++){
+    const k=ALL[i].k;
+    if(kind==='today'||kind==='all'||(kind==='builtin'&&k==='内置函数')||(kind==='str'&&k==='字符串方法'))out.push(i);
+  }
+  return out;
+}
+/* 推荐队列：先复习到期词（逾期越久越靠前，同批内随机），再学新词 */
+function buildQueue(kind){
+  const pool=poolIdx(kind);
+  const due=pool.filter(isDue).sort(function(a,b){return rec(a)[1]-rec(b)[1]});
+  const out=[];let bucket=[],bk=null;
+  due.forEach(function(i){
+    const k=Math.floor(rec(i)[1]/3600000);
+    if(bk===null||k===bk){bucket.push(i);bk=k}
+    else{out.push.apply(out,shuffle(bucket));bucket=[i];bk=k}
+  });
+  if(bucket.length)out.push.apply(out,shuffle(bucket));
+  let fresh=shuffle(pool.filter(function(i){return !learned(i)}));
+  let nNew=fresh.length;
+  if(kind==='today'){
+    const nl=DB.cfg.nl||0;
+    if(nl>0){fresh=fresh.slice(0,Math.max(0,nl-DB.dn));nNew=fresh.length}
+  }
+  return {queue:out.concat(fresh),nNew:nNew,nRev:out.length};
+}
+function countAll(){
+  let m=0,dr=0;
+  for(let i=0;i<ALL.length;i++){if(mastered(i))m++;if(isDue(i))dr++}
+  return {m:m,dr:dr};
+}
+function newAvail(){
+  const nl=DB.cfg.nl||0,tot=ALL.filter(function(w,i){return !learned(i)}).length;
+  return nl>0?Math.max(0,Math.min(nl-DB.dn,tot)):tot;
+}
+
+/* ==================== 首页 ==================== */
+function deckStat(key,arr){
+  const idx=[];ALL.forEach(function(w,i){if(arr.indexOf(w)>=0)idx.push(i)});
+  const m=idx.filter(mastered).length,d=idx.filter(isDue).length;
+  $('meta-'+key).textContent='已掌握 '+m+' / '+idx.length+(d?' · 待复习 '+d:'');
+  $('bar-'+key).style.width=Math.round(m/idx.length*100)+'%';
+}
+function refreshHome(){
+  const b=ALL.filter(function(x){return x.k==='内置函数'}),s=ALL.filter(function(x){return x.k==='字符串方法'});
+  const c=countAll(),na=newAvail(),tot=c.dr+na;
+  $('tc-date').textContent=todayStr();
+  $('tc-due').textContent=c.dr;
+  $('tc-new').textContent=na;
+  $('tc-done').textContent=DB.dn;
+  $('tc-total').innerHTML=tot+'<small>张</small>';
+  const btn=$('tc-btn');
+  if(tot===0){
+    btn.textContent='今日任务已完成 ✓';btn.disabled=true;
+    $('tc-note').textContent=c.m>=ALL.length?'全部词卡都已掌握，可以去自测检验':'暂时没有到期要复习的词，明天再来，或把每日新词调高';
+  }else{
+    btn.textContent='开始学习';btn.disabled=false;
+    $('tc-note').textContent=c.dr?('先复习 '+c.dr+' 张到期词，再学 '+na+' 个新词'):('学 '+na+' 个新词，认识后按等级安排复习');
+  }
+  $('stat-total').textContent=ALL.length;
+  $('stat-known').textContent=c.m;
+  $('stat-pct').innerHTML=Math.round(c.m/ALL.length*100)+'<small>%</small>';
+  deckStat('builtin',b);deckStat('str',s);
+  $('meta-all').textContent='已掌握 '+c.m+' / '+ALL.length+' · 待复习 '+c.dr;
+  $('bar-all').style.width=Math.round(c.m/ALL.length*100)+'%';
+  const nl=DB.cfg.nl||0;
+  document.querySelectorAll('#seg-new button').forEach(function(x){
+    if(x.classList)x.classList.toggle('on',+x.dataset.n===nl);
+  });
+  const st=$('storage-tip');if(st)st.style.display=LS_OK?'none':'block';
+}
 function goHome(){refreshHome();show('home')}
+function setNewLimit(v){DB.cfg.nl=+v;saveDB();refreshHome()}
+function resetProgress(){
+  if(!confirm('确定清空全部学习记录？掌握等级和复习安排都会重置。'))return;
+  DB.c={};DB.dn=0;saveDB();refreshHome();
+}
 
 /* ==================== 学习模式 ==================== */
-let S=null; // session
+let S=null;
+function deckName(kind){
+  return kind==='today'?'今日任务':kind==='builtin'?'内置函数':kind==='str'?'字符串方法':'混合复习';
+}
 function startStudy(kind){
-  let pool;
-  if(kind==='builtin')pool=ALL.filter(x=>x.k==='内置函数');
-  else if(kind==='str')pool=ALL.filter(x=>x.k==='字符串方法');
-  else pool=ALL.slice();
-  // 每次进入都全量随机，不依赖任何历史记录
-  const queue=shuffle(pool.slice());
-  S={queue,total:queue.length,graduated:new Set(),firstTryGood:0,needReview:0,cur:null,curRevealed:false,
-     name:kind==='builtin'?'内置函数':kind==='str'?'字符串方法':'混合复习'};
+  const bq=buildQueue(kind);
+  S={queue:bq.queue,total:bq.queue.length,passed:new Set(),firstTryGood:0,needReview:0,
+     cur:null,curRevealed:false,name:deckName(kind),nNew:bq.nNew,nRev:bq.nRev};
   $('study-deck-name').textContent='学习 · '+S.name;
   show('study');
   nextCard();
 }
 function nextCard(){
-  if(S.queue.length===0){finishStudy();return}
-  S.cur=S.queue.shift();
-  S.curRevealed=false;
-  const w=S.cur;
+  if(!S.queue.length){finishStudy();return}
+  const i=S.queue.shift();
+  S.cur=i;S.curRevealed=false;
+  const w=ALL[i];
   const card=$('word-card');
   card.classList.remove('revealed');
   card.style.animation='none';void card.offsetWidth;card.style.animation='';
   $('w-kind').textContent=w.k;
   $('w-name').textContent=w.n;
   $('w-cat').textContent='分类 · '+w.c;
+  const lv=lvlOf(i);
+  let lvHtml;
+  if(!learned(i)){
+    lvHtml='<span class="lvl-tag">新词</span>';
+  }else{
+    let dots='';for(let k=1;k<=MAXL;k++)dots+='<i class="'+(k<=lv?'on':'')+'"></i>';
+    lvHtml='<span class="lvl-bar">'+dots+'</span><span class="lvl-tag">'+(mastered(i)?'已掌握':'第 '+lv+' 级')+'</span>';
+    if(isDue(i))lvHtml+='<span class="lvl-tag" style="color:var(--accent)">到期复习</span>';
+  }
+  $('w-lvl').innerHTML=lvHtml;
   $('w-syntax').textContent=w.s;
   $('w-desc').textContent=w.d;
   $('w-example').textContent=w.ex;
@@ -573,42 +765,47 @@ function nextCard(){
   const pw=$('w-params-wrap');
   if(w.p&&w.p.length){
     let h='<div class="sec-label">参数</div><table class="param-table mono"><tr><th>参数</th><th>默认</th><th>说明</th></tr>';
-    w.p.forEach(r=>{h+=`<tr><td>${esc(r[0])}</td><td>${esc(r[2])}</td><td style="font-family:-apple-system,'PingFang SC',sans-serif">${esc(r[3])}</td></tr>`});
+    w.p.forEach(function(r){h+='<tr><td>'+esc(r[0])+'</td><td>'+esc(r[2])+'</td><td style="font-family:-apple-system,\'PingFang SC\',sans-serif">'+esc(r[3])+'</td></tr>'});
     pw.innerHTML=h+'</table>';
   }else{pw.innerHTML=''}
   updateProgress();
 }
 function revealCard(){if(S){S.curRevealed=true;$('word-card').classList.add('revealed')}}
 function updateProgress(){
-  $('study-count').textContent=S.graduated.size+' / '+S.total;
-  $('study-progress').style.width=(S.graduated.size/S.total*100)+'%';
+  $('study-count').textContent=S.passed.size+' / '+S.total;
+  $('study-progress').style.width=(S.passed.size/S.total*100)+'%';
 }
 function rate(grade){
-  if(!S||!S.cur)return;
-  const w=S.cur;
+  if(!S||S.cur===null)return;
+  const i=S.cur;
   try{
     if(grade==='good'){
-      if(!S.graduated.has(w.k+':'+w.n)&&S.curRevealed!==null){
-        if(S.queue.indexOf(w)===-1&&!w._retry)S.firstTryGood++;else S.needReview++;
-      }
-      S.graduated.add(w.k+':'+w.n);
+      if(!S.passed.has(i)){ if(!ALL[i]._retry)S.firstTryGood++; else S.needReview++; }
+      S.passed.add(i);
     }else{
-      w._retry=true;
-      // 不认识 → 隔 2 张再见；模糊 → 隔 4 张再见
+      ALL[i]._retry=true;
       const gap=grade==='again'?2:4;
-      const pos=Math.min(gap,S.queue.length);
-      S.queue.splice(pos,0,w);
+      S.queue.splice(Math.min(gap,S.queue.length),0,i);
       if(grade==='again'&&!S.curRevealed)revealCard();
     }
-  }catch(e){
-    // 任何异常都不能阻断翻卡
-  }
+    const wasNew=!learned(i);
+    applyGrade(i,grade);
+    if(wasNew)DB.dn++;
+    saveDB();
+  }catch(e){ /* 任何异常都不能阻断翻卡 */ }
   nextCard();
 }
+function nextDueText(){
+  let min=null;
+  for(let i=0;i<ALL.length;i++){const r=rec(i);if(r&&r[0]>0){if(min===null||r[1]<min)min=r[1]}}
+  return min===null?'':fmtGap(min-Date.now());
+}
 function finishStudy(){
-  $('done-sub').innerHTML=`「${S.name}」${S.total} 张词卡全部过完。刷新页面即可重新随机再来一轮。`;
+  const nd=nextDueText();
+  $('done-sub').innerHTML='「'+S.name+'」掌握 '+S.passed.size+' 张 · 新学 '+S.nNew+' · 复习 '+S.nRev
+    +(nd?'<br>下一次复习在 '+nd:'');
   $('done-good').textContent=S.firstTryGood;
-  $('done-review').textContent=S.total-S.firstTryGood;
+  $('done-review').textContent=S.needReview;
   show('done');
   refreshHome();
 }
@@ -617,15 +814,25 @@ function finishStudy(){
 const QN=10;
 let Q=null;
 function startQuiz(){
-  const items=shuffle(ALL.slice()).slice(0,QN);
-  Q={items,idx:0,score:0,locked:false};
+  const due=[],weak=[],fresh=[];
+  for(let i=0;i<ALL.length;i++){
+    if(isDue(i))due.push(i);
+    else if(learned(i)&&!mastered(i))weak.push(i);
+    else if(!learned(i))fresh.push(i);
+  }
+  let items=shuffle(due).concat(shuffle(weak),shuffle(fresh)).slice(0,QN);
+  if(items.length<QN){
+    const rest=[];for(let i=0;i<ALL.length;i++)if(items.indexOf(i)<0)rest.push(i);
+    items=items.concat(shuffle(rest).slice(0,QN-items.length));
+  }
+  Q={items:items,idx:0,score:0,locked:false,cur:null};
   show('quiz');
   nextQuestion();
 }
 function nextQuestion(){
   if(Q.idx>=QN){finishQuiz();return}
-  const w=Q.items[Q.idx];
-  Q.locked=false;
+  const i=Q.items[Q.idx],w=ALL[i];
+  Q.cur=i;Q.locked=false;
   $('quiz-count').textContent=(Q.idx+1)+' / '+QN;
   $('quiz-progress').style.width=(Q.idx/QN*100)+'%';
   $('quiz-score-line').textContent='答对 '+Q.score+' 题';
@@ -633,17 +840,15 @@ function nextQuestion(){
   $('q-desc').textContent=w.d;
   $('q-example').textContent=w.ex;
   $('q-output').textContent='▶ '+w.out;
-  $('q-example-wrap').classList.add('locked'); // 答题前隐藏示例，避免直接看到答案
-  // 选项：同类优先
-  const sameKind=ALL.filter(x=>x.k===w.k&&x.n!==w.n);
-  const distract=shuffle(sameKind.slice()).slice(0,3).map(x=>x.n);
-  const opts=shuffle([w.n,...distract]);
+  $('q-example-wrap').classList.add('locked');
+  const same=[];for(let j=0;j<ALL.length;j++)if(ALL[j].k===w.k&&ALL[j].n!==w.n)same.push(ALL[j].n);
+  const opts=shuffle([w.n].concat(shuffle(same).slice(0,3)));
   const list=$('opt-list');list.innerHTML='';
-  opts.forEach(name=>{
+  opts.forEach(function(name){
     const b=document.createElement('button');
     b.className='opt-btn serif';
-    b.innerHTML=`<span>${name}</span><span class="suffix">${w.k==='内置函数'?'f(x)':'str.'+name+'()'}</span>`;
-    b.onclick=()=>answer(b,name,w.n);
+    b.innerHTML='<span>'+name+'</span><span class="suffix">'+(w.k==='内置函数'?'f(x)':'str.'+name+'()')+'</span>';
+    b.onclick=function(){answer(b,name,w.n)};
     list.appendChild(b);
   });
 }
@@ -651,14 +856,20 @@ function answer(btn,name,correct){
   if(Q.locked)return;Q.locked=true;
   const ok=name===correct;
   if(ok)Q.score++;
-  document.querySelectorAll('.opt-btn').forEach(b=>{
+  document.querySelectorAll('.opt-btn').forEach(function(b){
     b.disabled=true;
-    const t=b.querySelector('span').textContent;
-    if(t===correct)b.classList.add('correct');
+    if(b.querySelector('span').textContent===correct)b.classList.add('correct');
     else if(b===btn)b.classList.add('wrong');
   });
+  try{
+    const i=Q.cur;
+    const wasNew=!learned(i);
+    applyGrade(i,ok?'good':'again');
+    if(wasNew)DB.dn++;
+    saveDB();
+  }catch(e){}
   $('quiz-score-line').textContent='答对 '+Q.score+' 题';
-  $('q-example-wrap').classList.remove('locked'); // 答完展开示例，对照记忆
+  $('q-example-wrap').classList.remove('locked');
   Q.idx++;
   setTimeout(nextQuestion,ok?900:1800);
 }
@@ -667,9 +878,11 @@ function finishQuiz(){
   const s=Q.score;
   $('qd-badge').textContent=s>=9?'🏆':s>=6?'💪':'📖';
   $('qd-title').textContent=s+' / '+QN;
-  $('qd-sub').textContent=s>=9?'太棒了！英文名和用法已经完全对上。':s>=6?'不错！错的那几个回去再刷一轮词卡。':'建议先回学习模式把词卡过一遍再来。';
+  $('qd-sub').textContent=s>=9?'太棒了！英文名和用法已经完全对上。':s>=6?'不错！答错的已标记，明天会优先复习。':'答错的词已标记为「不认识」，下次会优先出现。';
   show('quiz-done');
+  refreshHome();
 }
+
 
 /* ============ 安装到手机桌面（PWA） ============ */
 let deferredPrompt=null;
