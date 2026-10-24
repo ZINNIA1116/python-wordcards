@@ -176,6 +176,59 @@ body::before{
 .opt-btn.wrong{background:#F9EAE5;border-color:var(--accent);color:var(--accent)}
 .opt-btn:disabled{cursor:default}
 .quiz-score-line{font-size:13px;color:var(--ink-faint);text-align:center;padding-bottom:8px;flex-shrink:0}
+/* ============ 查询（速查词典） ============ */
+.ref-crumb{font-size:clamp(17px,5vw,20px);font-weight:700}
+.ref-btn{margin-top:12px;width:100%;background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:18px;padding:16px 22px;font-size:clamp(15px,4.4vw,17px);font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:transform .18s ease}
+.ref-btn:active{transform:scale(.975)}
+.ref-btn span:last-child{font-size:12.5px;font-weight:400;color:var(--ink-faint);letter-spacing:.04em}
+.ref-body{flex:1;overflow-y:auto;padding:0 20px calc(28px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
+.ref-hero{padding:4px 2px 2px}
+.ref-hero .t{font-size:clamp(22px,6.4vw,28px);font-weight:700}
+.ref-hero .s{margin-top:8px;font-size:clamp(12.5px,3.6vw,14px);color:var(--ink-soft);line-height:1.7}
+.cat-chips{display:flex;gap:7px;overflow-x:auto;padding:4px 18px 10px;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cat-chips::-webkit-scrollbar{display:none}
+.cat-chips button{flex-shrink:0;border:1px solid var(--hair);background:var(--card);color:var(--ink-soft);font-size:12.5px;padding:7px 13px;border-radius:99px;cursor:pointer;touch-action:manipulation}
+.cat-chips button.on{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:600}
+.ref-search{display:flex;align-items:center;gap:9px;padding:2px 18px 6px;flex-shrink:0}
+.ref-search input{flex:1;min-width:0;font-family:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:12px 14px;outline:none;user-select:text;-webkit-user-select:text}
+.ref-search input:focus{border-color:var(--accent)}
+.ref-search input::placeholder{color:var(--ink-faint)}
+.ref-clear{width:34px;height:34px;flex-shrink:0;border-radius:50%;border:1px solid var(--hair);background:var(--card);color:var(--ink-soft);font-size:15px;display:none;align-items:center;justify-content:center;padding:0}
+.ref-clear.show{display:flex}
+.ref-split{flex:1;display:flex;min-height:0;position:relative}
+.ref-index{flex:1;overflow-y:auto;padding:0 12px 24px;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;user-select:text;-webkit-user-select:text}
+.idx-letter{font-size:11px;letter-spacing:.22em;color:var(--accent);padding:14px 6px 6px;font-weight:700}
+.idx-item{width:100%;text-align:left;border:none;background:transparent;border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;touch-action:manipulation}
+.idx-item:active{background:var(--paper2)}
+.idx-item.on{background:var(--ink)}
+.idx-item .nm{font-size:15px;font-weight:600;color:var(--ink);font-family:"SF Mono",Consolas,"Courier New",monospace;word-break:break-all}
+.idx-item.on .nm{color:var(--paper)}
+.idx-item .ds{font-size:11.5px;color:var(--ink-faint);line-height:1.5;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.idx-item.on .ds{color:#C9C1B0}
+.idx-item .hl{color:var(--accent);font-style:normal}
+.idx-item.on .hl{color:#F2B84B}
+.idx-count{padding:2px 6px 10px;font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em}
+.idx-empty{text-align:center;color:var(--ink-faint);font-size:13.5px;padding:44px 20px;line-height:1.9}
+.ref-detail{display:none}
+.ref-detail-inner{padding:0 0 calc(30px + env(safe-area-inset-bottom))}
+.ref-d-head{padding:6px 20px 16px;border-bottom:1px dashed var(--hair)}
+.ref-d-name{font-size:clamp(25px,7.4vw,33px);font-weight:700;font-family:"SF Mono",Consolas,"Courier New",monospace;word-break:break-all;line-height:1.15}
+.ref-d-tags{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.ref-d-tags span{font-size:11px;letter-spacing:.14em;border:1px solid var(--hair);border-radius:99px;padding:4px 10px 3px;color:var(--ink-soft)}
+.ref-d-syn{margin-top:12px;display:block;font-size:clamp(11.5px,3.4vw,13.5px);background:var(--paper2);border-radius:10px;padding:8px 14px;color:var(--ink-soft);word-break:break-all;line-height:1.65}
+.ref-d-sec{padding:0 20px}
+.ref-back2{display:none}
+@media(min-width:720px){
+  #reflist{max-width:960px}
+  .ref-index{width:262px;flex:0 0 262px;border-right:1px solid var(--hair);padding:0 10px 24px}
+  .ref-detail{display:block;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .ref-detail-inner{padding:0 0 40px}
+  .ref-d-head{padding-top:22px}
+}
+@media(max-width:719px){
+  .ref-detail.show{display:block;position:absolute;inset:0;background:var(--paper);z-index:6;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .ref-back2{display:flex;align-items:center;gap:6px;border:none;background:transparent;color:var(--ink-soft);font-size:13.5px;padding:14px 20px 12px;cursor:pointer}
+}
 /* ============ 小屏 / 矮屏适配（应对分享页 iframe 高度受限） ============ */
 @media(max-width:390px){
   .home-inner{padding:40px 20px 40px}
@@ -260,6 +313,9 @@ body::before{
     </div>
     <button class="quiz-btn" onclick="startQuiz()" data-page-node-id="B8uMCn8QvaPeOcCFju1Rv6">
       <span data-page-node-id="ti4GYFDC6m4J63MpJdh7X1">✍️ 开始自测</span><span data-page-node-id="b9GvT793sEYEHV84AUyatm">看用法 · 选英文名</span>
+    </button>
+    <button class="ref-btn" onclick="openRef()">
+      <span>🔍 查函数 · 查方法</span><span>按索引翻 · 关键词搜</span>
     </button>
     <button id="install-btn" onclick="doInstall()" data-page-node-id="installBtn">📲 把词卡安装到手机桌面</button>
     <div id="install-tip" data-page-node-id="installTip"></div>
@@ -351,6 +407,59 @@ body::before{
   <div class="done-btns" style="margin-top:30px" data-page-node-id="9TVHTFPUojifp4Nhbi27wf">
     <button class="btn-primary" onclick="startQuiz()" data-page-node-id="Q2FV79c5CCSAEZwVqpm9Wa">再来一轮</button>
     <button class="btn-ghost" onclick="goHome()" data-page-node-id="1bMT8ovSDRqyDxvXFaJ3AO">返回首页</button>
+  </div>
+</div>
+
+<!-- ================= 查询：分类入口 ================= -->
+<div class="screen" id="ref">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="progress-wrap"><div class="ref-crumb serif">查函数 · 查方法</div></div>
+  </div>
+  <div class="ref-body">
+    <div class="ref-hero">
+      <div class="t serif">Python 用法速查</div>
+      <div class="s">共 <b id="ref-total">76</b> 条。点分类进去后，左边是名字索引、右边是详细用法，顶部还能直接搜。</div>
+    </div>
+    <div class="deck-card" onclick="openRefList('builtin','')">
+      <div class="deck-kind">Chapter 7 · 函数</div>
+      <div class="deck-name serif">内置函数 <span style="font-size:14px;color:var(--ink-faint);font-weight:400">print · len · range…</span></div>
+      <div class="deck-meta" id="refmeta-builtin">共 32 条</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="deck-card" onclick="openRefList('str','')">
+      <div class="deck-kind">Chapter 4 · 字符串</div>
+      <div class="deck-name serif">字符串方法 <span style="font-size:14px;color:var(--ink-faint);font-weight:400">split · join · strip…</span></div>
+      <div class="deck-meta" id="refmeta-str">共 44 条</div>
+      <div class="arrow">→</div>
+    </div>
+    <div class="deck-card" onclick="openRefList('all','')">
+      <div class="deck-kind">All in one</div>
+      <div class="deck-name serif">全部一起查</div>
+      <div class="deck-meta">76 条混在一起，随便搜</div>
+      <div class="arrow">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 查询：索引 + 详情 ================= -->
+<div class="screen" id="reflist">
+  <div class="topbar">
+    <button class="back-btn" onclick="backToRef()">←</button>
+    <div class="progress-wrap"><div class="ref-crumb serif" id="ref-crumb">内置函数</div></div>
+  </div>
+  <div class="ref-search">
+    <input id="ref-q" type="search" autocomplete="off" placeholder="搜函数名，或输用法关键词（如 排序）" oninput="onRefSearch()" oncompositionend="onRefSearch()">
+    <button class="ref-clear" id="ref-clear" onclick="clearRefSearch()">×</button>
+  </div>
+  <div class="cat-chips" id="ref-cats"></div>
+  <div class="ref-split">
+    <div class="ref-index" id="ref-index"></div>
+    <div class="ref-detail" id="ref-detail">
+      <div class="ref-detail-inner" id="ref-detail-inner">
+        <div class="idx-empty">← 左边选一个，<br>这里看它的详细用法</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -883,6 +992,191 @@ function finishQuiz(){
   refreshHome();
 }
 
+
+/* ============ 查询（速查词典）：分类 → 索引 → 详情 ============ */
+const REF_SUB={
+  builtin:['输入输出','类型转换','数学','序列','高阶函数','对象','文件'],
+  str:['大小写','查找','替换','修剪','填充','拆分','合并','判断','格式化','编码','映射']
+};
+let REF={kind:'all',cat:'',q:'',cur:-1};
+
+function inRefPool(x){
+  if(REF.kind==='all')return true;
+  return REF.kind==='builtin'?x.k==='内置函数':x.k==='字符串方法';
+}
+/* 常见口语说法 → 词库里实际出现的词。学生搜"去空格"能找到 strip，搜"拼接"能找到 join */
+const REF_SYN=[
+  ['去空格',['空白','strip','两端']],['空格',['空白','strip','两端']],['trim',['strip','空白']],
+  ['大小写',['大写','小写','case']],['转大写',['upper','大写']],['转小写',['lower','小写']],
+  ['大写',['upper','大写']],['小写',['lower','小写']],
+  ['排序',['排序','sort']],['倒序',['reversed','反向','逆序']],['反转',['reversed','反向']],
+  ['长度',['len','个数','元素个数']],['个数',['len','长度']],
+  ['分割',['split','拆分']],['拆分',['split','分割','partition']],['切分',['split','分割']],
+  ['拼接',['join','连接','合并']],['连接',['join','拼接','合并']],['合并',['join','拼接']],
+  ['替换',['replace','替换']],['查找',['find','index','搜索','出现']],['搜索',['find','index','查找']],
+  ['判断',['是否','检查']],['检查',['是否','判断']],['是否',['判断','检查']],
+  ['取整',['round','四舍五入']],['四舍五入',['round']],['绝对值',['abs']],
+  ['最大值',['max','最大']],['最小值',['min','最小']],['最大',['max']],['最小',['min']],
+  ['求和',['sum','总和']],['输入',['input','读取一行']],['输出',['print','打印']],['打印',['print']],
+  ['类型转换',['int','float','str','转换']],['转换',['int','float','str','bool','list','类型转换']],
+  ['文件',['open','读写']],['打开',['open','文件']],['读写',['open','文件']],
+  ['格式化',['format','占位符']],['居中',['center','填充']],['补零',['zfill','填充 0']],
+  ['遍历',['enumerate','迭代']],['过滤',['filter','筛选']],['筛选',['filter','过滤']],
+  ['编码',['encode','字节']],['去掉',['移除','删除']],['删除',['移除','去掉']]
+];
+function refExpand(q){
+  const s=q.toLowerCase(),out=[];
+  if(s.length<2)return out;
+  REF_SYN.forEach(function(p){
+    const k=p[0].toLowerCase();
+    if(k===s||k.indexOf(s)>=0||s.indexOf(k)>=0) p[1].forEach(function(t){out.push(t.toLowerCase())});
+  });
+  return out;
+}
+/* 命中打分：函数名全等 100 > 前缀 80 > 包含 60 > 释义/原型/参数/示例/子类 40 > 同义词命中 30 */
+function refScore(x,q,extra){
+  const s=q.toLowerCase(),n=x.n.toLowerCase();
+  if(n===s)return 100;
+  if(n.indexOf(s)===0)return 80;
+  if(n.indexOf(s)>0)return 60;
+  const hay=(x.d+' '+x.s+' '+x.c+' '+(x.p||[]).map(function(p){return p.join(' ')}).join(' ')+' '+x.ex+' '+(x.out||'')).toLowerCase();
+  /* 同义词直接点名这个函数（如"去空格"→strip）比释义里顺带提到更该排前面 */
+  if(extra&&extra.indexOf(n)>=0)return 45;
+  if(hay.indexOf(s)>=0)return 40;
+  if(extra){
+    for(let i=0;i<extra.length;i++) if(hay.indexOf(extra[i])>=0) return 30;
+  }
+  return 0;
+}
+function refHl(n,q){
+  const s=(q||'').trim(); if(!s)return esc(n);
+  const i=n.toLowerCase().indexOf(s.toLowerCase());
+  if(i<0)return esc(n);
+  return esc(n.slice(0,i))+'<em class="hl">'+esc(n.slice(i,i+s.length))+'</em>'+esc(n.slice(i+s.length));
+}
+function openRef(){show('ref')}
+function backToRef(){show('ref')}
+function openRefList(kind,cat){
+  REF.kind=kind||'all';REF.cat=cat||'';REF.q='';REF.cur=-1;
+  const qi=$('ref-q'); if(qi)qi.value='';
+  const c=$('ref-clear'); if(c)c.classList.remove('show');
+  $('ref-crumb').textContent=REF.kind==='builtin'?'内置函数':(REF.kind==='str'?'字符串方法':'全部');
+  closeRefDetail();renderRefCats();renderRefIndex();
+  show('reflist');
+}
+function renderRefCats(){
+  const box=$('ref-cats'); if(!box)return;
+  const subs=REF.kind==='all'?[]:(REF_SUB[REF.kind]||[]);
+  const pool=[]; for(let i=0;i<ALL.length;i++) if(inRefPool(ALL[i])) pool.push(ALL[i]);
+  let h='<button type="button" class="'+(REF.cat?'':'on')+'" onclick="setRefCat(\'\')">全部 '+pool.length+'</button>';
+  subs.forEach(function(c){
+    const n=pool.filter(function(x){return x.c===c}).length;
+    if(!n)return;
+    h+='<button type="button" class="'+(REF.cat===c?'on':'')+'" onclick="setRefCat(\''+c+'\')">'+esc(c)+' '+n+'</button>';
+  });
+  box.innerHTML=h;
+}
+function setRefCat(c){
+  REF.cat=c;REF.cur=-1;closeRefDetail();renderRefCats();renderRefIndex();
+  const b=$('ref-index'); if(b)b.scrollTop=0;
+}
+function onRefSearch(){
+  const qi=$('ref-q'); if(!qi)return;
+  REF.q=qi.value||'';
+  const c=$('ref-clear'); if(c)c.classList.toggle('show',!!REF.q);
+  renderRefIndex();
+}
+function clearRefSearch(){
+  REF.q='';$('ref-q').value='';$('ref-clear').classList.remove('show');renderRefIndex();$('ref-q').focus();
+}
+function refList(){
+  const out=[];
+  for(let i=0;i<ALL.length;i++){
+    const x=ALL[i];
+    if(!inRefPool(x))continue;
+    if(REF.cat&&x.c!==REF.cat)continue;
+    out.push({x:x,i:i});
+  }
+  const q=(REF.q||'').trim();
+  if(q){
+    const extra=refExpand(q);
+    out.forEach(function(o){o.sc=refScore(o.x,q,extra)});
+    return out.filter(function(o){return o.sc>0})
+              .sort(function(a,b){return (b.sc-a.sc)||a.x.n.localeCompare(b.x.n)});
+  }
+  return out.sort(function(a,b){return a.x.n.localeCompare(b.x.n)});
+}
+function refItem(o,q){
+  return '<button type="button" class="idx-item" data-i="'+o.i+'" onclick="showRefDetail('+o.i+')">'+
+    '<span class="nm">'+refHl(o.x.n,q)+'</span>'+
+    '<span class="ds">'+esc(o.x.d)+'</span></button>';
+}
+function renderRefIndex(){
+  const box=$('ref-index'); if(!box)return;
+  const q=(REF.q||'').trim();
+  const arr=refList();
+  if(!arr.length){
+    box.innerHTML='<div class="idx-empty">没找到「'+esc(q)+'」相关的函数或方法<br>换个词试试：排序、拆分、大小写、去空格、类型转换</div>';
+    return;
+  }
+  let h='';
+  if(q){
+    h+='<div class="idx-count">匹配到 '+arr.length+' 条</div>';
+    arr.forEach(function(o){h+=refItem(o,q)});
+  }else{
+    let letter='';
+    arr.forEach(function(o){
+      const L=(o.x.n[0]||'#').toUpperCase();
+      if(L!==letter){letter=L;h+='<div class="idx-letter">'+L+'</div>'}
+      h+=refItem(o,q);
+    });
+  }
+  box.innerHTML=h;
+  markRefIndex();
+}
+function markRefIndex(){
+  const ns=document.querySelectorAll('#ref-index .idx-item');
+  for(let i=0;i<ns.length;i++){
+    ns[i].classList.toggle('on',String(REF.cur)===ns[i].getAttribute('data-i'));
+  }
+}
+function showRefDetail(i){
+  REF.cur=+i;
+  const x=ALL[REF.cur]; if(!x)return;
+  let h='<button type="button" class="ref-back2" onclick="closeRefDetail()">← 返回索引</button>';
+  h+='<div class="ref-d-head"><div class="ref-d-name">'+esc(x.n)+'</div>'+
+     '<div class="ref-d-tags"><span>'+esc(x.k)+'</span><span>'+esc(x.c)+'</span></div>'+
+     '<div class="ref-d-syn mono">'+esc(x.s)+'</div></div>';
+  h+='<div class="ref-d-sec"><div class="sec-label">作用</div><div class="desc-text">'+esc(x.d)+'</div>';
+  if(x.p&&x.p.length){
+    h+='<div class="sec-label">参数</div><table class="param-table">'+
+       '<tr><th>参数</th><th>类型</th><th>默认</th><th>说明</th></tr>';
+    x.p.forEach(function(p){
+      h+='<tr><td>'+esc(p[0])+'</td><td>'+esc(p[1])+'</td><td>'+esc(p[2])+'</td><td>'+esc(p[3])+'</td></tr>';
+    });
+    h+='</table>';
+  }
+  h+='<div class="sec-label">示例</div><div class="code-block mono">'+esc(x.ex)+'</div>';
+  if(x.out)h+='<div class="code-out mono">'+esc(x.out)+'</div>';
+  h+='</div>';
+  $('ref-detail-inner').innerHTML=h;
+  $('ref-detail').classList.add('show');
+  $('ref-detail').scrollTop=0;
+  markRefIndex();
+}
+function closeRefDetail(){
+  REF.cur=-1;
+  const d=$('ref-detail'); if(d)d.classList.remove('show');
+  markRefIndex();
+}
+function initRefCounts(){
+  const b=ALL.filter(function(x){return x.k==='内置函数'}).length;
+  const s=ALL.filter(function(x){return x.k==='字符串方法'}).length;
+  const t=$('ref-total'); if(t)t.textContent=ALL.length;
+  const mb=$('refmeta-builtin'); if(mb)mb.textContent='共 '+b+' 条';
+  const ms=$('refmeta-str'); if(ms)ms.textContent='共 '+s+' 条';
+}
+initRefCounts();
 
 /* ============ 安装到手机桌面（PWA） ============ */
 let deferredPrompt=null;
